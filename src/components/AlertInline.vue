@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from "vue";
-const props = defineProps(["type", "title", "description"]);
+import { formatDate } from "@/lib/utils.js";
+const props = defineProps(["type", "title", "description", "date"]);
 
 const iconClassString = computed(() => {
 	let output = "";
@@ -77,7 +78,9 @@ const titleClassString = computed(() => {
 					</p>
 				</div>
 				<div class="w-30 flex-shrink-0">
-					<span class="font-light italic text-xs">2022-02-03 5:39PM</span>
+					<span class="font-light italic text-xs">{{
+						formatDate(new Date(date))
+					}}</span>
 				</div>
 			</div>
 		</div>

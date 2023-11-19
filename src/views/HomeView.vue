@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { Splitpanes, Pane } from "splitpanes";
 import "splitpanes/dist/splitpanes.css";
 
@@ -20,6 +20,14 @@ function handleUserStoryClick(key) {
 	console.log("Clicked on", key);
 	currentUserStory.value = key;
 }
+
+const currentUserStoryInfoMessages = computed(() => {
+	if (currentUserStory.value)
+		console.log(userStories.items[currentUserStory.value].infoMessages);
+	return currentUserStory.value
+		? userStories.items[currentUserStory.value].infoMessages
+		: [];
+});
 
 const modalVisible_addStories = ref(false);
 function handleOpenModal() {
@@ -84,33 +92,20 @@ function handleAddStories(data) {
 						>
 							<span class="text-sm font-bold">Info Panel</span>
 						</div>
-						<div class="overflow-auto flex flex-col gap-3 px-3">
-							<AlertInline
-								type="warning"
-								title="Clarification (Jira User Stories)"
-								description="Generating questions to ask Jira User Stories..."
-							/>
-							<AlertInline
-								type="info"
-								title="Q: SLS-7874: What is the Game Story preview subpage? What is the purpose of this subpage? What elements are included on this subpage?"
-								description="A: The Game Story preview subpage is a subpage in the course editor where teachers can edit the settings for the game story. The settings include the title of the game story, the description, the image, and the conditions that must be met for the game story to be displayed to students."
-							/>
-							<AlertInline
-								type="info"
-								title='Q: SLS-7905: What is the purpose of the "Move Up" and "Move Down" buttons?'
-								description='A: The "Move Up" and "Move Down" buttons are used to reorder the activities in a lesson.'
-							/>
-							<AlertInline
-								type="warning"
-								title="Clarification (MOE User Guide)"
-								description="Generating questions to ask MOE User Guide..."
-							/>
-							<AlertInline
-								type="info"
-								title="Q: What are the steps to create a new game story?"
-								description="A: To create a new game story, you need to go to the Add Conditions subpage, click Add Conditions and select Game Story. From the left dropdown menu, choose a Game Story. Click Save to proceed."
-							/>
-						</div>
+						<ul class="flex flex-col gap-3 px-3 overflow-auto list-none pb-4">
+							<li
+								v-for="(
+									{ type, title, description, date }, index
+								) in currentUserStoryInfoMessages"
+							>
+								<AlertInline
+									:type="type"
+									:title="title"
+									:description="description"
+									:date="date"
+								/>
+							</li>
+						</ul>
 					</pane>
 				</splitpanes>
 			</pane>
