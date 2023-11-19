@@ -30,9 +30,9 @@ export const useTestScenariosStore = defineStore("test-scenarios", {
 		},
 	}),
 	actions: {
-		addItem(key, description, conditions, steps, result) {
-			if (!Object.keys(this.items).includes(key)) this.items[key] = {};
-			this.items[key].push({
+		addItem(storyId, description, conditions, steps, result) {
+			if (!Object.keys(this.items).includes(storyId)) this.items[storyId] = {};
+			this.items[storyId].push({
 				id: Date.now(),
 				description,
 				conditions,
@@ -41,8 +41,11 @@ export const useTestScenariosStore = defineStore("test-scenarios", {
 				status: "draft",
 			});
 		},
-		setItemAsConfirmed(key, id) {
-			this.items[key][id].status = "confirmed";
+		deleteItem(storyId, testId) {
+			delete this.items[storyId][testId];
+		},
+		setItemAsConfirmed(storyId, testId) {
+			this.items[storyId][testId].status = "confirmed";
 		},
 	},
 });
