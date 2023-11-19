@@ -6,7 +6,7 @@ const issueUrl = `https://jira.sls.ufinity.com/browse/${props.storyId}`;
 <template>
 	<div
 		class="max-w-2xl px-8 py-4 bg-white rounded-lg shadow-md dark:bg-gray-800 cursor-pointer hover:shadow-lg"
-		:class="{ 'border-2 border-blue-400': props.active }"
+		:class="{ 'inset-outline shadow-blue-400': props.active }"
 	>
 		<div class="flex items-center justify-between">
 			<a
@@ -34,3 +34,9 @@ const issueUrl = `https://jira.sls.ufinity.com/browse/${props.storyId}`;
 		</div>
 	</div>
 </template>
+
+<style scoped>
+.inset-outline {
+	box-shadow: inset 0 0 0 2px #3b82f6; /* Adjust the color and size as needed */
+}
+</style>
