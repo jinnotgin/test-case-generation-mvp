@@ -48,7 +48,7 @@ function handleAddStories(data) {
 				size="20"
 				min-size="20"
 				max-size="30"
-				class="flex flex-col gap-4 overflow-auto p-3"
+				class="flex flex-col gap-4 overflow-auto p-4"
 			>
 				<div class="flex justify-between items-center">
 					<h3 class="text-xl font-medium text-gray-800 dark:text-white">
