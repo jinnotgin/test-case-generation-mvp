@@ -7,7 +7,7 @@ export const useUserStoriesStore = defineStore("user-stories", {
 				title:
 					"As Teacher, given a Question with Speech Evaluation (SE) component in a Teacher Release Quiz, only allowed to mark my student's responses after the external Speech Evaluation engine has provided marks recommendations",
 				content: "",
-				status: "procesing",
+				status: "processing",
 				infoMessages: [
 					{
 						type: "warning",
