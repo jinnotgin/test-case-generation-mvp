@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from "vue";
 import Row from "@/components/TestScenariosTableRowView.vue";
+import ButtonSmall from "@/components/ButtonSmall.vue";
 
 const props = defineProps(["items"]);
 const itemsCount = computed(() => {
@@ -10,15 +11,18 @@ const itemsCount = computed(() => {
 
 <template>
 	<section class="container px-4 mx-auto">
-		<div class="flex items-center gap-x-3">
-			<h2 class="text-xl font-medium text-gray-800 dark:text-white">
-				Generated Test Scenarios
-			</h2>
+		<div class="flex items-center justify-between">
+			<div class="flex items-center gap-x-3">
+				<h2 class="text-xl font-medium text-gray-800 dark:text-white">
+					Generated Test Scenarios
+				</h2>
 
-			<span
-				class="px-3 py-1 text-xs text-blue-600 bg-blue-100 rounded-full dark:bg-gray-800 dark:text-blue-400"
-				>{{ itemsCount }} items</span
-			>
+				<span
+					class="px-3 py-1 text-xs text-blue-600 bg-blue-100 rounded-full dark:bg-gray-800 dark:text-blue-400"
+					>{{ itemsCount }} items</span
+				>
+			</div>
+			<ButtonSmall color="primary" text="Submit" disabled />
 		</div>
 
 		<div class="flex flex-col mt-6">
