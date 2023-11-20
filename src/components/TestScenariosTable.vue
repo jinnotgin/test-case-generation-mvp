@@ -83,7 +83,7 @@ watch(
 			<EmptyPlaceholder
 				icon="feather"
 				title="No test scenarios"
-				description='Please click on "Run" to begin generating test scenarios. This may take a while.'
+				description="Please wait for the test scenarios to be generated. This may take a while."
 			/>
 		</div>
 		<div v-else class="flex flex-col mt-4">
