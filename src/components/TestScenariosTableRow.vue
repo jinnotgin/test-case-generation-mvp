@@ -71,14 +71,17 @@ function handleSelectClick(e) {
 				placeholder="Description"
 				>{{ description }}</textarea
 			>
-			<p v-else class="whitespace-pre-line">
+			<p v-else class="whitespace-pre-line" @dblclick="handleStartEdit">
 				{{ description }}
 			</p>
 		</td>
 		<td
 			class="px-4 py-3 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"
 		>
-			<ul class="whitespace-pre-line flex flex-col gap-2 list-none">
+			<ul
+				class="whitespace-pre-line flex flex-col gap-2 list-none"
+				@dblclick="handleStartEdit"
+			>
 				<li>
 					<p class="underline">Pre-Conditions</p>
 					<textarea
