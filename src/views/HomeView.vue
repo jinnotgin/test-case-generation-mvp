@@ -3,12 +3,12 @@ import { ref, computed } from "vue";
 import { Splitpanes, Pane } from "splitpanes";
 import "splitpanes/dist/splitpanes.css";
 
-import StoryCard from "../components/StoryCard.vue";
-import TestScenariosTable from "../components/TestScenariosTable.vue";
-import AlertInline from "../components/AlertInline.vue";
-import ButtonSmall from "../components/ButtonSmall.vue";
-import ModalAddStories from "../components/ModalAddStories.vue";
-import EmptyPlaceholder from "../components/EmptyPlaceholder.vue";
+import StoryCard from "@/components/StoryCard.vue";
+import TestScenariosTable from "@/components/TestScenariosTable.vue";
+import AlertInline from "@/components/AlertInline.vue";
+import ButtonSmall from "@/components/ButtonSmall.vue";
+import ModalAddStories from "@/components/ModalAddStories.vue";
+import EmptyPlaceholder from "@/components/EmptyPlaceholder.vue";
 
 import { useUserStoriesStore } from "@/stores/user-stories";
 import { useTestScenariosStore } from "@/stores/test-cases";

@@ -2,7 +2,7 @@
 import { computed } from "vue";
 import Row from "@/components/TestScenariosTableRowView.vue";
 import ButtonSmall from "@/components/ButtonSmall.vue";
-import EmptyPlaceholder from "../components/EmptyPlaceholder.vue";
+import EmptyPlaceholder from "@/components/EmptyPlaceholder.vue";
 
 const props = defineProps(["items"]);
 const itemsCount = computed(() => {
