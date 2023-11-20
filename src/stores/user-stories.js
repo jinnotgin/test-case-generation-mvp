@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { toIsoStringWithTimezone } from "@/lib/utils.js";
 
+// user story status: ready, queued, processing, success, error
 export const useUserStoriesStore = defineStore("user-stories", {
 	state: () => ({
 		items: {
@@ -55,7 +56,7 @@ export const useUserStoriesStore = defineStore("user-stories", {
 	}),
 	actions: {
 		addItem(key, title, content) {
-			this.items[key] = { title, content };
+			this.items[key] = { title, content, status: "ready", infoMessages: [] };
 		},
 		removeItem(key, title, content) {
 			delete this.items[key];
