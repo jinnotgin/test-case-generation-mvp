@@ -45,9 +45,9 @@ export const useUserStoriesStore = defineStore("user-stories", {
 					},
 				],
 			},
-			"SLS-8041": {
+			"SLS-8698": {
 				title:
-					"As Teacher, given a Question with Speech Evaluation (SE) component in a Teacher Release Quiz, only allowed to mark my student's responses after the external Speech Evaluation engine has provided marks recommendations",
+					"As Teacher, toggle Game Team leaderboard functionality for assignees (ie students) (via Assignment Monitoring - Gamification)",
 				content: "",
 				status: "queued",
 				infoMessages: [],
