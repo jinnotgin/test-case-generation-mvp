@@ -4,7 +4,7 @@ defineProps(["icon", "title", "description"]);
 </script>
 <template>
 	<div
-		class="flex items-center mt-6 text-center border rounded-lg h-96 dark:border-gray-700"
+		class="flex items-center text-center border rounded-lg h-full dark:border-gray-700 overflow-hidden"
 	>
 		<div class="flex flex-col w-full max-w-sm px-4 mx-auto">
 			<div

@@ -37,7 +37,7 @@ const currentUserStoryData = computed(() => {
 		: null;
 });
 const currentUserStoryInfoMessages = computed(() => {
-	return currentUserStoryData ? currentUserStoryData.value.infoMessages : [];
+	return currentUserStoryData.value ? currentUserStoryData.value.infoMessages : [];
 });
 
 const modalVisible_addStories = ref(false);
@@ -57,9 +57,8 @@ function handleAddStories(data) {
 	<main class="h-full">
 		<splitpanes class="default-theme">
 			<pane
-				size="20"
-				min-size="20"
-				max-size="30"
+				size="25"
+				min-size="25"
 				class="flex flex-col gap-4 overflow-auto p-4"
 			>
 				<div class="flex justify-between items-center">
@@ -68,11 +67,11 @@ function handleAddStories(data) {
 					</h3>
 					<div class="flex gap-3">
 						<ButtonSmall
+							v-if="userStoriesCount > 0"
 							text="+ Add"
 							color="secondary"
 							@click="handleOpenModal"
 						/>
-						<ButtonSmall text="▶ Run" :disabled="userStoriesCount === 0" />
 					</div>
 				</div>
 				<EmptyPlaceholder
@@ -99,8 +98,14 @@ function handleAddStories(data) {
 				</ul>
 			</pane>
 			<pane size="80" min-size="50">
-				<splitpanes horizontal>
-					<pane size="65" class="overflow-auto py-4"
+				<EmptyPlaceholder
+							v-if="currentUserStory === null || !Object.keys(userStories.items).includes(currentUserStory)"
+							icon="arrow-left"
+							title="Click on a user story to begin"
+							description=""
+						/>
+				<splitpanes v-else horizontal>
+					<pane size="65" class="flex py-4 h-full"
 						><TestScenariosTable
 							:items="
 								currentUserStory ? testScenarios.items[currentUserStory] : {}
@@ -112,6 +117,7 @@ function handleAddStories(data) {
 						>
 							<span class="text-sm font-bold">Info Panel</span>
 						</div>
+						
 						<EmptyPlaceholder
 							v-if="currentUserStoryInfoMessages.length === 0"
 							icon="info"
