@@ -1,9 +1,9 @@
 <script setup>
-defineProps({"description": String, "conditions": String, "steps": String, "result": String, "status": String, "editing": Boolean});
+defineProps(["description", "conditions", "steps", "result", "status"]);
 </script>
 <template>
 	<tr class="align-top">
-		<td class="px-4 py-3">
+		<td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
 			<div class="inline-flex items-center gap-x-3">
 				<input
 					type="checkbox"
@@ -11,34 +11,33 @@ defineProps({"description": String, "conditions": String, "steps": String, "resu
 				/>
 			</div>
 		</td>
-		<td class="px-4 py-3 text-sm font-medium text-gray-700 whitespace-nowrap">
-			<textarea v-if="editing" class="py-2 px-3 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400 dark:focus:ring-gray-600" rows="5" placeholder="Description">{{ description }}</textarea>
-			<p v-else class="whitespace-pre-line">
+		<td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
+			<span class="whitespace-pre-line">
 				{{ description }}
-			</p>
+			</span>
 		</td>
 		<td
-			class="px-4 py-3 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"
+			class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"
 		>
-			<ul class="whitespace-pre-line flex flex-col gap-2 list-none">
-				<li>
-					<p class="underline">Pre-Conditions</p>
-					<textarea v-if="editing" class="py-2 px-3 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400 dark:focus:ring-gray-600" rows="5" placeholder="Conditions">{{ conditions }}</textarea>
-					<p v-else>{{ conditions }}</p>
-				</li>
-				<li>
-					<p class="underline">Steps</p>
-            		<textarea v-if="editing" class="py-2 px-3 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400 dark:focus:ring-gray-600" rows="5" placeholder="Steps">{{ steps }}</textarea>
-					<p v-else>{{ steps }}</p>
-				</li>
-				<li>
-					<p class="underline">Expected Results</p>
-					<textarea v-if="editing"  class="py-2 px-3 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400 dark:focus:ring-gray-600" rows="5" placeholder="Expected Result">{{ result }}</textarea>
-					<p v-else>{{ result }}</p>
-				</li>
-			</ul>
+			<span class="whitespace-pre-line">
+				{{ conditions }}
+			</span>
 		</td>
-		<td class="px-12 py-3 text-sm text-gray-700 whitespace-nowrap">
+		<td
+			class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"
+		>
+			<span class="whitespace-pre-line">
+				{{ steps }}
+			</span>
+		</td>
+		<td
+			class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"
+		>
+			<span class="whitespace-pre-line">
+				{{ result }}
+			</span>
+		</td>
+		<td class="px-12 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
 			<div
 				v-if="status === 'draft'"
 				class="inline-flex items-center px-3 py-1 rounded-full gap-x-2 bg-blue-100/60 dark:bg-gray-800"

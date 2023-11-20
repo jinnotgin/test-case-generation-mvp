@@ -11,7 +11,7 @@ const itemsCount = computed(() => {
 </script>
 
 <template>
-	<section class="container px-4 mx-auto h-full flex flex-col overflow-auto">
+	<section class="container px-4 mx-auto h-full flex flex-col">
 		<div class="flex items-center justify-between">
 			<div class="flex items-center gap-x-3">
 				<h2 class="text-xl font-medium text-gray-800 dark:text-white">
@@ -58,7 +58,7 @@ const itemsCount = computed(() => {
 									</th>
 									<th
 										scope="col"
-										class="py-3.5 px-4 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 w-1/3"
+										class="py-3.5 px-4 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400"
 									>
 										<div class="flex items-center gap-x-3">
 											<span>Description</span>
@@ -67,12 +67,28 @@ const itemsCount = computed(() => {
 
 									<th
 										scope="col"
-										class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 w-1/2"
+										class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400"
 									>
 										<button class="flex items-center gap-x-2">
-											<span>Details</span>
+											<span>Pre-Conditions</span>
 										</button>
 									</th>
+									<th
+										scope="col"
+										class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400"
+									>
+										<button class="flex items-center gap-x-2">
+											<span>Steps</span>
+										</button>
+									</th>
+
+									<th
+										scope="col"
+										class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400"
+									>
+										Expected Result
+									</th>
+
 									<th
 										scope="col"
 										class="px-12 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400"
