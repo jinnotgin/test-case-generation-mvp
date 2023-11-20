@@ -41,6 +41,10 @@ const currentUserStoryInfoMessages = computed(() => {
 		: [];
 });
 
+const currentIssueUrl = computed(() => {
+	return `https://jira.sls.ufinity.com/browse/${currentUserStoryId.value}`;
+});
+
 const modalVisible_addStories = ref(false);
 function handleOpenModal() {
 	modalVisible_addStories.value = true;
@@ -116,7 +120,12 @@ function handleAddStories(data) {
 							>
 								<div class="flex">
 									<p>
-										<span class="font-medium">{{ currentUserStoryId }}</span
+										<a
+											:href="currentIssueUrl"
+											class="font-bold hover:text-gray-600 dark:hover:text-gray-200 hover:underline"
+											tabindex="0"
+											role="link"
+											>{{ currentUserStoryId }}</a
 										>: {{ currentUserStoryData.title }}
 									</p>
 								</div>

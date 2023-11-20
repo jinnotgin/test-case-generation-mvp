@@ -1,6 +1,5 @@
 <script setup>
 const props = defineProps(["title", "status", "storyId", "active"]);
-const issueUrl = `https://jira.sls.ufinity.com/browse/${props.storyId}`;
 </script>
 
 <template>
@@ -9,13 +8,9 @@ const issueUrl = `https://jira.sls.ufinity.com/browse/${props.storyId}`;
 		:class="{ 'inset-outline shadow-blue-400': props.active }"
 	>
 		<div class="flex items-center justify-between">
-			<a
-				:href="issueUrl"
-				class="text-md font-bold text-gray-700 dark:text-white hover:text-gray-600 dark:hover:text-gray-200 hover:underline"
-				tabindex="0"
-				role="link"
-				>{{ storyId }}</a
-			>
+			<span class="text-md font-bold text-gray-700 dark:text-white">{{
+				storyId
+			}}</span>
 			<a
 				class="px-3 py-1 text-xs font-bold text-gray-100 transition-colors duration-300 transform bg-gray-600 rounded cursor-pointer hover:bg-gray-500 capitalize"
 				tabindex="0"
