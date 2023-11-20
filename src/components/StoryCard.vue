@@ -5,7 +5,7 @@ const issueUrl = `https://jira.sls.ufinity.com/browse/${props.storyId}`;
 
 <template>
 	<div
-		class="max-w-2xl px-5 py-4 bg-white rounded-lg shadow-md dark:bg-gray-800 cursor-pointer hover:shadow-lg"
+		class="px-5 py-4 bg-white rounded-lg shadow-md dark:bg-gray-800 cursor-pointer hover:shadow-lg"
 		:class="{ 'inset-outline shadow-blue-400': props.active }"
 	>
 		<div class="flex items-center justify-between">
