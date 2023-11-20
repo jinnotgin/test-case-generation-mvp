@@ -1,17 +1,33 @@
 <script setup>
-import { computed } from "vue";
-import Row from "@/components/TestScenariosTableRowView.vue";
+import { ref, computed, watch } from "vue";
+import Row from "@/components/TestScenariosTableRow.vue";
 import ButtonSmall from "@/components/ButtonSmall.vue";
 import EmptyPlaceholder from "@/components/EmptyPlaceholder.vue";
 
-const props = defineProps(["items"]);
+const props = defineProps(["userStoryId", "items"]);
 const itemsCount = computed(() => {
 	return props.items ? Object.keys(props.items).length : 0;
 });
+
+const beingEdited = ref(new Set([]));
+function handleStartEdit(testCaseId) {
+	beingEdited.value.add(testCaseId);
+}
+function handleEndEdit(testCaseId) {
+	beingEdited.value.delete(testCaseId);
+}
+watch(
+	() => props.userStoryId,
+	(newValue, oldValue) => {
+		beingEdited.value.clear();
+	}
+);
 </script>
 
 <template>
-	<section class="container px-4 mx-auto h-full flex flex-col overflow-auto">
+	<section
+		class="container px-4 mx-auto h-full flex flex-col overflow-y-auto overflow-x-hidden"
+	>
 		<div class="flex items-center justify-between">
 			<div class="flex items-center gap-x-3">
 				<h2 class="text-xl font-medium text-gray-800 dark:text-white">
@@ -23,19 +39,26 @@ const itemsCount = computed(() => {
 					>{{ itemsCount }} items</span
 				>
 			</div>
-			<ButtonSmall v-if="itemsCount > 0" color="primary" text="Submit" disabled />
+			<ButtonSmall
+				v-if="itemsCount > 0"
+				color="primary"
+				text="Submit"
+				disabled
+			/>
 		</div>
 
-		<div class="mt-6 h-full" v-if="!items || (items && Object.keys(items).length === 0)">
-		<EmptyPlaceholder
-			icon="feather"
-			title="No test scenarios"
-			description='Please click on "Run" to begin generating test scenarios. This may take a while.'
-		/>
-
+		<div
+			class="mt-4 h-full"
+			v-if="!items || (items && Object.keys(items).length === 0)"
+		>
+			<EmptyPlaceholder
+				icon="feather"
+				title="No test scenarios"
+				description='Please click on "Run" to begin generating test scenarios. This may take a while.'
+			/>
 		</div>
-		<div v-else class="flex flex-col mt-6">
-			<div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+		<div v-else class="flex flex-col mt-4">
+			<div class="-mx-4 -my-2 sm:-mx-6 lg:-mx-8">
 				<div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
 					<div
 						class="overflow-hidden border border-gray-200 dark:border-gray-700 md:rounded-lg"
@@ -94,12 +117,16 @@ const itemsCount = computed(() => {
 								:key="key"
 							>
 								<Row
+									:userStoryId="userStoryId"
 									:testId="key"
 									:description="description"
 									:conditions="conditions"
 									:steps="steps"
 									:result="result"
 									:status="status"
+									:editing="beingEdited.has(key)"
+									@start-edit="handleStartEdit"
+									@end-edit="handleEndEdit"
 								/>
 							</tbody>
 						</table>

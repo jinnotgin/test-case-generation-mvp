@@ -44,6 +44,18 @@ export const useTestScenariosStore = defineStore("test-scenarios", {
 		deleteItem(storyId, testId) {
 			delete this.items[storyId][testId];
 		},
+		setItemDescription(storyId, testId, newValue) {
+			this.items[storyId][testId].description = newValue;
+		},
+		setItemConditions(storyId, testId, newValue) {
+			this.items[storyId][testId].conditions = newValue;
+		},
+		setItemSteps(storyId, testId, newValue) {
+			this.items[storyId][testId].steps = newValue;
+		},
+		setItemResult(storyId, testId, newValue) {
+			this.items[storyId][testId].result = newValue;
+		},
 		setItemAsConfirmed(storyId, testId) {
 			this.items[storyId][testId].status = "confirmed";
 		},

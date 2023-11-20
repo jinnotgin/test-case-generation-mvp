@@ -5,19 +5,19 @@ const issueUrl = `https://jira.sls.ufinity.com/browse/${props.storyId}`;
 
 <template>
 	<div
-		class="max-w-2xl px-8 py-4 bg-white rounded-lg shadow-md dark:bg-gray-800 cursor-pointer hover:shadow-lg"
+		class="max-w-2xl px-5 py-4 bg-white rounded-lg shadow-md dark:bg-gray-800 cursor-pointer hover:shadow-lg"
 		:class="{ 'inset-outline shadow-blue-400': props.active }"
 	>
 		<div class="flex items-center justify-between">
 			<a
 				:href="issueUrl"
-				class="text-xl font-bold text-gray-700 dark:text-white hover:text-gray-600 dark:hover:text-gray-200 hover:underline"
+				class="text-md font-bold text-gray-700 dark:text-white hover:text-gray-600 dark:hover:text-gray-200 hover:underline"
 				tabindex="0"
 				role="link"
 				>{{ storyId }}</a
 			>
 			<a
-				class="px-3 py-1 text-sm font-bold text-gray-100 transition-colors duration-300 transform bg-gray-600 rounded cursor-pointer hover:bg-gray-500 capitalize"
+				class="px-3 py-1 text-xs font-bold text-gray-100 transition-colors duration-300 transform bg-gray-600 rounded cursor-pointer hover:bg-gray-500 capitalize"
 				tabindex="0"
 				role="button"
 				>{{ status }}</a
@@ -26,7 +26,7 @@ const issueUrl = `https://jira.sls.ufinity.com/browse/${props.storyId}`;
 
 		<div class="mt-2">
 			<p
-				class="mt-2 text-gray-600 dark:text-gray-300 line-clamp-4"
+				class="mt-2 text-md text-gray-600 dark:text-gray-300 line-clamp-3"
 				:title="title"
 			>
 				{{ title }}

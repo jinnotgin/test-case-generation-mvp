@@ -22,22 +22,23 @@ const userStoriesCount = computed(() => {
 		: 0;
 });
 
-const currentUserStory = ref(null);
+const currentUserStoryId = ref(null);
 if (userStoriesCount.value > 0) {
-	currentUserStory.value = Object.keys(userStories.items)[0];
+	currentUserStoryId.value = Object.keys(userStories.items)[0];
 }
 
 function handleUserStoryClick(key) {
-	console.log("Clicked on", key);
-	currentUserStory.value = key;
+	currentUserStoryId.value = key;
 }
 const currentUserStoryData = computed(() => {
-	return currentUserStory && currentUserStory.value
-		? userStories.items[currentUserStory.value]
+	return currentUserStoryId && currentUserStoryId.value
+		? userStories.items[currentUserStoryId.value]
 		: null;
 });
 const currentUserStoryInfoMessages = computed(() => {
-	return currentUserStoryData.value ? currentUserStoryData.value.infoMessages : [];
+	return currentUserStoryData.value
+		? currentUserStoryData.value.infoMessages
+		: [];
 });
 
 const modalVisible_addStories = ref(false);
@@ -58,7 +59,7 @@ function handleAddStories(data) {
 		<splitpanes class="default-theme">
 			<pane
 				size="25"
-				min-size="25"
+				min-size="20"
 				class="flex flex-col gap-4 overflow-auto p-4"
 			>
 				<div class="flex justify-between items-center">
@@ -92,23 +93,41 @@ function handleAddStories(data) {
 							:storyId="key"
 							:title="title"
 							:status="status"
-							:active="currentUserStory === key"
+							:active="currentUserStoryId === key"
 						/>
 					</li>
 				</ul>
 			</pane>
 			<pane size="80" min-size="50">
 				<EmptyPlaceholder
-							v-if="currentUserStory === null || !Object.keys(userStories.items).includes(currentUserStory)"
-							icon="arrow-left"
-							title="Click on a user story to begin"
-							description=""
-						/>
+					v-if="
+						currentUserStoryId === null ||
+						!Object.keys(userStories.items).includes(currentUserStoryId)
+					"
+					icon="arrow-left"
+					title="Click on a user story to begin"
+					description=""
+				/>
 				<splitpanes v-else horizontal>
-					<pane size="65" class="flex py-4 h-full"
-						><TestScenariosTable
+					<pane size="65" class="flex flex-col pb-4 h-full">
+						<div class="w-ful bg-slate-200 mb-4">
+							<div
+								class="container flex items-center justify-between px-4 py-4 mx-auto"
+							>
+								<div class="flex">
+									<p>
+										<span class="font-medium">{{ currentUserStoryId }}</span
+										>: {{ currentUserStoryData.title }}
+									</p>
+								</div>
+							</div>
+						</div>
+						<TestScenariosTable
+							:userStoryId="currentUserStoryId"
 							:items="
-								currentUserStory ? testScenarios.items[currentUserStory] : {}
+								currentUserStoryId
+									? testScenarios.items[currentUserStoryId]
+									: {}
 							"
 					/></pane>
 					<pane size="35" class="flex flex-col gap-2"
@@ -117,7 +136,7 @@ function handleAddStories(data) {
 						>
 							<span class="text-sm font-bold">Info Panel</span>
 						</div>
-						
+
 						<EmptyPlaceholder
 							v-if="currentUserStoryInfoMessages.length === 0"
 							icon="info"
