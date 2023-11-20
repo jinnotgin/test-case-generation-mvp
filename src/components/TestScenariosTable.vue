@@ -3,11 +3,38 @@ import { ref, computed, watch } from "vue";
 import Row from "@/components/TestScenariosTableRow.vue";
 import ButtonSmall from "@/components/ButtonSmall.vue";
 import EmptyPlaceholder from "@/components/EmptyPlaceholder.vue";
+import { useTestScenariosStore } from "@/stores/test-cases";
 
 const props = defineProps(["userStoryId", "items"]);
 const itemsCount = computed(() => {
 	return props.items ? Object.keys(props.items).length : 0;
 });
+
+const store = useTestScenariosStore();
+
+const selected = ref(new Set([]));
+function handleSelect(testCaseId) {
+	selected.value.add(testCaseId);
+}
+function handleDeselect(testCaseId) {
+	selected.value.delete(testCaseId);
+}
+const allItemsSelected = computed(() => {
+	const testCasesIds = Object.keys(store.items[props.userStoryId]);
+	const totalCount = testCasesIds.length;
+
+	const selectedCount = selected.value.size;
+
+	return selectedCount === totalCount;
+});
+function toggleSelectAll() {
+	const testCasesIds = Object.keys(store.items[props.userStoryId]);
+
+	if (allItemsSelected.value) selected.value.clear();
+	else {
+		for (let id of testCasesIds) handleSelect(id);
+	}
+}
 
 const beingEdited = ref(new Set([]));
 function handleStartEdit(testCaseId) {
@@ -16,9 +43,11 @@ function handleStartEdit(testCaseId) {
 function handleEndEdit(testCaseId) {
 	beingEdited.value.delete(testCaseId);
 }
+
 watch(
 	() => props.userStoryId,
 	(newValue, oldValue) => {
+		selected.value.clear();
 		beingEdited.value.clear();
 	}
 );
@@ -43,7 +72,7 @@ watch(
 				v-if="itemsCount > 0"
 				color="primary"
 				text="Submit"
-				disabled
+				:disabled="selected.size === 0"
 			/>
 		</div>
 
@@ -76,6 +105,8 @@ watch(
 											<input
 												type="checkbox"
 												class="text-blue-500 border-gray-300 rounded dark:bg-gray-900 dark:ring-offset-gray-900 dark:border-gray-700"
+												:checked="allItemsSelected"
+												@click="toggleSelectAll"
 											/>
 										</div>
 									</th>
@@ -125,8 +156,11 @@ watch(
 									:result="result"
 									:status="status"
 									:editing="beingEdited.has(key)"
+									:checked="selected.has(key)"
 									@start-edit="handleStartEdit"
 									@end-edit="handleEndEdit"
+									@select="handleSelect"
+									@deselect="handleDeselect"
 								/>
 							</tbody>
 						</table>

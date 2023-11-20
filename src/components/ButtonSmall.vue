@@ -1,17 +1,20 @@
 <script setup>
+import { computed } from "vue";
 const props = defineProps({ color: String, text: String, disabled: Boolean });
-let buttonClass = "";
-switch (props.color) {
-	case "secondary":
-		buttonClass =
-			"text-gray-600 bg-white dark:hover:bg-gray-800 dark:text-gray-300 hover:bg-gray-100";
-		break;
-	default:
-		buttonClass = "text-white bg-blue-600 hover:bg-blue-500";
-		break;
-}
-if (props.disabled)
-	buttonClass = `${buttonClass} opacity-25 hover:cursor-not-allowed`;
+const buttonClass = computed(() => {
+	let output = "";
+	switch (props.color) {
+		case "secondary":
+			output =
+				"text-gray-600 bg-white dark:hover:bg-gray-800 dark:text-gray-300 hover:bg-gray-100";
+			break;
+		default:
+			output = "text-white bg-blue-600 hover:bg-blue-500";
+			break;
+	}
+	if (props.disabled) output = `${output} opacity-25 hover:cursor-not-allowed`;
+	return output;
+});
 </script>
 
 <template>

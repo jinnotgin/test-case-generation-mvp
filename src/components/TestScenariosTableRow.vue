@@ -11,6 +11,7 @@ const props = defineProps({
 	result: String,
 	status: String,
 	editing: Boolean,
+	checked: Boolean,
 });
 
 const store = useTestScenariosStore();
@@ -35,12 +36,17 @@ const resultValue = computed({
 	set: (value) => store.setItemResult(props.userStoryId, props.testId, value),
 });
 
-const emit = defineEmits(["start-edit", "end-edit"]);
+const emit = defineEmits(["start-edit", "end-edit", "select", "deselect"]);
 function handleStartEdit() {
 	emit("start-edit", props.testId);
 }
 function handleEndEdit() {
 	emit("end-edit", props.testId);
+}
+function handleSelectClick(e) {
+	const isChecked = e.target.checked;
+	if (isChecked) emit("select", props.testId);
+	else emit("deselect", props.testId);
 }
 </script>
 
@@ -51,6 +57,8 @@ function handleEndEdit() {
 				<input
 					type="checkbox"
 					class="text-blue-500 border-gray-300 rounded dark:bg-gray-900 dark:ring-offset-gray-900 dark:border-gray-700"
+					:checked="checked"
+					@click="handleSelectClick"
 				/>
 			</div>
 		</td>
