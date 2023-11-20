@@ -7,11 +7,14 @@ import { RouterLink, RouterView } from "vue-router";
 		<img
 			alt="Vue logo"
 			class="logo mx-2"
-			src="@/assets/testcasegen-variant02.png"
+			src="@/assets/logo.svg"
 			width="42"
 		/>
+		<span class="font-bold font-mono logo-text text-md">TestForge AI</span>
 
-		<nav class="ml-4 flex gap-4">
+		<div class="mx-4 h-full border border-slate-300"></div>
+
+		<nav class="flex gap-4">
 			<RouterLink to="/">Home</RouterLink>
 			<RouterLink to="/about">Chat</RouterLink>
 		</nav>
@@ -23,8 +26,11 @@ import { RouterLink, RouterView } from "vue-router";
 </template>
 
 <style scoped>
+.logo-text {
+	color: rgb(28, 46, 64)
+}
 .router-link-active {
 	font-weight: 600;
-	color: rgb(19, 46, 67);
+	color: rgb(28, 46, 64)
 }
 </style>
