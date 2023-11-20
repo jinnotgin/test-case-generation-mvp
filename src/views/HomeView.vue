@@ -8,6 +8,7 @@ import TestScenariosTable from "../components/TestScenariosTable.vue";
 import AlertInline from "../components/AlertInline.vue";
 import ButtonSmall from "../components/ButtonSmall.vue";
 import ModalAddStories from "../components/ModalAddStories.vue";
+import EmptyPlaceholder from "../components/EmptyPlaceholder.vue";
 
 import { useUserStoriesStore } from "@/stores/user-stories";
 import { useTestScenariosStore } from "@/stores/test-cases";
@@ -15,18 +16,28 @@ import { useTestScenariosStore } from "@/stores/test-cases";
 const userStories = useUserStoriesStore();
 const testScenarios = useTestScenariosStore();
 
+const userStoriesCount = computed(() => {
+	return userStories && userStories.items
+		? Object.keys(userStories.items).length
+		: 0;
+});
+
 const currentUserStory = ref(null);
+if (userStoriesCount.value > 0) {
+	currentUserStory.value = Object.keys(userStories.items)[0];
+}
+
 function handleUserStoryClick(key) {
 	console.log("Clicked on", key);
 	currentUserStory.value = key;
 }
-
+const currentUserStoryData = computed(() => {
+	return currentUserStory && currentUserStory.value
+		? userStories.items[currentUserStory.value]
+		: null;
+});
 const currentUserStoryInfoMessages = computed(() => {
-	if (currentUserStory.value)
-		console.log(userStories.items[currentUserStory.value].infoMessages);
-	return currentUserStory.value
-		? userStories.items[currentUserStory.value].infoMessages
-		: [];
+	return currentUserStoryData ? currentUserStoryData.value.infoMessages : [];
 });
 
 const modalVisible_addStories = ref(false);
@@ -37,6 +48,7 @@ function handleCloseModal() {
 	modalVisible_addStories.value = false;
 }
 function handleAddStories(data) {
+	// TODO
 	console.log(data);
 }
 </script>
@@ -60,10 +72,18 @@ function handleAddStories(data) {
 							color="secondary"
 							@click="handleOpenModal"
 						/>
-						<ButtonSmall text="▶ Run" />
+						<ButtonSmall text="▶ Run" :disabled="userStoriesCount === 0" />
 					</div>
 				</div>
-				<ul class="list-none flex flex-col gap-2">
+				<EmptyPlaceholder
+					v-if="userStoriesCount === 0"
+					icon="book"
+					title="No user stories"
+					description="You have not added any user stories yet. Please add some to generate your test scenarios."
+				>
+					<ButtonSmall text="+ Add" color="primary" @click="handleOpenModal" />
+				</EmptyPlaceholder>
+				<ul v-else class="list-none flex flex-col gap-2">
 					<li
 						v-for="({ title, status }, key) in userStories.items"
 						:key="key"
@@ -92,6 +112,12 @@ function handleAddStories(data) {
 						>
 							<span class="text-sm font-bold">Info Panel</span>
 						</div>
+						<EmptyPlaceholder
+							v-if="currentUserStoryInfoMessages.length === 0"
+							icon="info"
+							title="Nothing to see here"
+							description=""
+						/>
 						<ul class="flex flex-col gap-3 px-3 overflow-auto list-none pb-4">
 							<li
 								v-for="(

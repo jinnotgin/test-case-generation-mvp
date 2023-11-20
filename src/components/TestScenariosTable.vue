@@ -2,6 +2,7 @@
 import { computed } from "vue";
 import Row from "@/components/TestScenariosTableRowView.vue";
 import ButtonSmall from "@/components/ButtonSmall.vue";
+import EmptyPlaceholder from "../components/EmptyPlaceholder.vue";
 
 const props = defineProps(["items"]);
 const itemsCount = computed(() => {
@@ -25,7 +26,13 @@ const itemsCount = computed(() => {
 			<ButtonSmall color="primary" text="Submit" disabled />
 		</div>
 
-		<div class="flex flex-col mt-6">
+		<EmptyPlaceholder
+			v-if="!items || (items && Object.keys(items).length === 0)"
+			icon="feather"
+			title="No test scenarios"
+			description='Please click on "Run" to begin generating test scenarios. This may take a while.'
+		/>
+		<div v-else class="flex flex-col mt-6">
 			<div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
 				<div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
 					<div
