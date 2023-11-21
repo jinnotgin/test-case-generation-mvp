@@ -25,7 +25,6 @@ export async function getJiraIssue(issueId) {
 		const json = await response.json();
 		const data = JSON.parse(json.data);
 
-		// Assuming 'data' contains the response as in your example
 		// Extract the issue ID, title (summary), and description
 		const issueId_response = data.key;
 		const title = data.fields.summary;
