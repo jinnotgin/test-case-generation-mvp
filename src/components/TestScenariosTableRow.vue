@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from "vue";
 import VueFeather from "vue-feather";
-import { useTestScenariosStore } from "@/stores/test-cases";
+import { useTestScenariosStore } from "@/stores/test-scenarios";
 const props = defineProps({
 	userStoryId: String,
 	testId: String,

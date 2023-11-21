@@ -11,7 +11,7 @@ import ModalAddStories from "@/components/ModalAddStories.vue";
 import EmptyPlaceholder from "@/components/EmptyPlaceholder.vue";
 
 import { useUserStoriesStore } from "@/stores/user-stories";
-import { useTestScenariosStore } from "@/stores/test-cases";
+import { useTestScenariosStore } from "@/stores/test-scenarios";
 
 const userStories = useUserStoriesStore();
 const testScenarios = useTestScenariosStore();

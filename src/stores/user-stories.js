@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { toIsoStringWithTimezone } from "@/lib/utils.js";
 import { getJiraIssue } from "@/lib/api.js";
-import { useTestScenariosStore } from "@/stores/test-cases.js";
+import { useTestScenariosStore } from "@/stores/test-scenarios.js";
 import { STORY_STATUS } from "@/lib/constants.js";
 
 export const useUserStoriesStore = defineStore("user-stories", {

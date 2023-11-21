@@ -3,7 +3,7 @@ import { ref, computed, watch } from "vue";
 import Row from "@/components/TestScenariosTableRow.vue";
 import ButtonSmall from "@/components/ButtonSmall.vue";
 import EmptyPlaceholder from "@/components/EmptyPlaceholder.vue";
-import { useTestScenariosStore } from "@/stores/test-cases";
+import { useTestScenariosStore } from "@/stores/test-scenarios";
 
 const props = defineProps(["userStoryId", "items"]);
 const itemsCount = computed(() => {
