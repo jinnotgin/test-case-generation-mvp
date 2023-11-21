@@ -1,8 +1,9 @@
 import { defineStore } from "pinia";
 import { toIsoStringWithTimezone } from "@/lib/utils.js";
 import { getJiraIssue } from "@/lib/api.js";
+import { useTestScenariosStore } from "@/stores/test-cases.js";
+import { STORY_STATUS } from "@/lib/constants.js";
 
-// user story status: ready, queued, processing, success, error
 export const useUserStoriesStore = defineStore("user-stories", {
 	state: () => ({
 		items: {
@@ -10,7 +11,7 @@ export const useUserStoriesStore = defineStore("user-stories", {
 				title:
 					"As Teacher, given a Question with Speech Evaluation (SE) component in a Teacher Release Quiz, only allowed to mark my student's responses after the external Speech Evaluation engine has provided marks recommendations",
 				content: "",
-				status: "processing",
+				status: STORY_STATUS.DONE,
 				infoMessages: [
 					{
 						type: "warning",
@@ -50,17 +51,21 @@ export const useUserStoriesStore = defineStore("user-stories", {
 				title:
 					"As Teacher, toggle Game Team leaderboard functionality for assignees (ie students) (via Assignment Monitoring - Gamification)",
 				content: "",
-				status: "queued",
+				status: STORY_STATUS.QUEUED,
 				infoMessages: [],
 			},
 		},
+		processingQueue: [],
+		maxQueueLength: 2, // configurable queue length
 	}),
 	actions: {
 		addItem(key, title, content) {
-			this.items[key] = { title, content, status: "ready", infoMessages: [] };
-		},
-		removeItem(key) {
-			delete this.items[key];
+			this.items[key] = {
+				title,
+				content,
+				status: STORY_STATUS.QUEUED,
+				infoMessages: [],
+			};
 		},
 		async fetchDataforIds(listofIds = []) {
 			for (let storyId of listofIds) {
@@ -73,12 +78,6 @@ export const useUserStoriesStore = defineStore("user-stories", {
 				}
 			}
 		},
-		setItemAsProcessing(key) {
-			this.items[key].status = "processing";
-		},
-		setItemAsDone(key) {
-			this.items[key].status = "done";
-		},
 		addInfoMessageToItem(key, type, title, description) {
 			this.items[key].infoMessages.push({
 				type,
@@ -86,6 +85,66 @@ export const useUserStoriesStore = defineStore("user-stories", {
 				description,
 				date: toIsoStringWithTimezone(new Date()),
 			});
+		},
+		processQueuedStories() {
+			console.log("Checking queued items...");
+			console.log(this.processingQueue);
+			// TODO: Add another mechanism here to check for new info messages for STATUS.PROCESSING
+
+			// below will check if queue is empty and add more items into queue
+
+			// Filter out already processing stories
+			const processingStories = Object.keys(this.items).filter(
+				(key) => this.items[key].status === STORY_STATUS.PROCESSING
+			);
+
+			// Calculate available slots in the queue
+			const availableSlots = this.maxQueueLength - processingStories.length;
+
+			if (availableSlots > 0) {
+				Object.entries(this.items).forEach(([key, story]) => {
+					if (
+						story.status === STORY_STATUS.QUEUED &&
+						this.processingQueue.length < this.maxQueueLength
+					) {
+						// Change the status to processing
+						this.items[key].status = STORY_STATUS.PROCESSING;
+						this.processingQueue.push(key);
+
+						// [TODO] processing and polling
+						// for now Simulate processing and removal from queue
+						setTimeout(
+							() => {
+								const testScenariosStore = useTestScenariosStore();
+
+								// Add fake response data to test scenarios store
+								testScenariosStore.addItem(
+									key,
+									"Description 123",
+									"Conditions 123",
+									"Steps 123",
+									"Results 123"
+								);
+								testScenariosStore.addItem(
+									key,
+									"Description 456",
+									"Conditions 456",
+									"Steps 456",
+									"Results 456"
+								);
+
+								// After processing, change the status (e.g., to 'done') and remove from the queue
+								this.items[key].status = STORY_STATUS.DONE; // Assuming 'done' is a status
+								this.processingQueue = this.processingQueue.filter(
+									(id) => id !== key
+								);
+							},
+							5000,
+							key
+						); // Simulated processing time
+					}
+				});
+			}
 		},
 	},
 });

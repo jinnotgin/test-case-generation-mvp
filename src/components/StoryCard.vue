@@ -1,5 +1,29 @@
 <script setup>
+import { computed } from "vue";
+import { STORY_STATUS } from "@/lib/constants.js";
 const props = defineProps(["title", "status", "storyId", "active"]);
+
+const statusClass = computed(() => {
+	let output = "";
+	switch (props.status) {
+		case STORY_STATUS.DONE:
+			output = "bg-green-600";
+			break;
+		case STORY_STATUS.PROCESSING:
+			output = "bg-blue-600";
+			break;
+		case STORY_STATUS.QUEUED:
+			output = "bg-gray-600";
+			break;
+		case STORY_STATUS.ERROR:
+			output = "bg-red-600";
+			break;
+		default:
+			output = "bg-gray-600";
+			break;
+	}
+	return output;
+});
 </script>
 
 <template>
@@ -11,12 +35,12 @@ const props = defineProps(["title", "status", "storyId", "active"]);
 			<span class="text-md font-bold text-gray-700 dark:text-white">{{
 				storyId
 			}}</span>
-			<a
-				class="px-3 py-1 text-xs font-bold text-gray-100 transition-colors duration-300 transform bg-gray-600 rounded cursor-pointer hover:bg-gray-500 capitalize"
-				tabindex="0"
-				role="button"
-				>{{ status }}</a
+			<div
+				class="px-3 py-1 text-xs font-bold text-gray-100 transition-colors duration-300 transform rounded capitalize"
+				:class="statusClass"
 			>
+				{{ status }}
+			</div>
 		</div>
 
 		<div class="mt-2">

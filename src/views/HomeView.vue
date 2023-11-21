@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import { Splitpanes, Pane } from "splitpanes";
 import "splitpanes/dist/splitpanes.css";
 
@@ -56,6 +56,19 @@ function handleAddStories(data) {
 	console.log(data);
 	userStories.fetchDataforIds(data);
 }
+
+let intervalId = null;
+const startPolling = () => {
+	intervalId = setInterval(() => {
+		userStories.processQueuedStories();
+	}, 5000); // Poll every 5 seconds
+};
+onMounted(startPolling);
+onUnmounted(() => {
+	if (intervalId) {
+		clearInterval(intervalId);
+	}
+});
 </script>
 
 <template>

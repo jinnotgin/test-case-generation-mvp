@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from "vue";
 const props = defineProps({ color: String, text: String, disabled: Boolean });
+
 const buttonClass = computed(() => {
 	let output = "";
 	switch (props.color) {

@@ -32,14 +32,16 @@ export const useTestScenariosStore = defineStore("test-scenarios", {
 	actions: {
 		addItem(storyId, description, conditions, steps, result) {
 			if (!Object.keys(this.items).includes(storyId)) this.items[storyId] = {};
-			this.items[storyId].push({
-				id: Date.now(),
+			const testId = Math.floor(Date.now() * Math.random() * 10);
+			console.log(testId);
+			this.items[storyId][testId] = {
+				id: testId,
 				description,
 				conditions,
 				steps,
 				result,
 				status: "draft",
-			});
+			};
 		},
 		deleteItem(storyId, testId) {
 			delete this.items[storyId][testId];
