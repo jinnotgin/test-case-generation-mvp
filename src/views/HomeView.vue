@@ -69,6 +69,9 @@ onUnmounted(() => {
 		clearInterval(intervalId);
 	}
 });
+
+// TODO: Remove this from production (this is only for mock data)
+userStories.addToProcessingQueue();
 </script>
 
 <template>

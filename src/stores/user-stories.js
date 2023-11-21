@@ -9,7 +9,7 @@ export const useUserStoriesStore = defineStore("user-stories", {
 		items: {
 			"SLS-8040": {
 				title:
-					"As Teacher, given a Question with Speech Evaluation (SE) component in a Teacher Release Quiz, only allowed to mark my student's responses after the external Speech Evaluation engine has provided marks recommendations",
+					"As a user, able to browse Gamified course from cards and table listing",
 				content: "",
 				status: STORY_STATUS.DONE,
 				infoMessages: [
@@ -54,9 +54,23 @@ export const useUserStoriesStore = defineStore("user-stories", {
 				status: STORY_STATUS.QUEUED,
 				infoMessages: [],
 			},
+			"SLS-7723": {
+				title:
+					"As Teacher, upon deletion of checkpoint, awarded checkpoints will be deleted in student consumption",
+				content: "",
+				status: STORY_STATUS.QUEUED,
+				infoMessages: [],
+			},
+			"SLS-8788": {
+				title:
+					"As Teacher, only add up to a maximum of 100 Game Teams per Assignment in an assigned Lesson / Course (Assignment) (Max Limit)",
+				content: "",
+				status: STORY_STATUS.QUEUED,
+				infoMessages: [],
+			},
 		},
 		processingQueue: [],
-		maxQueueLength: 2, // configurable queue length
+		maxQueueLength: 1, // configurable queue length
 	}),
 	actions: {
 		addItem(key, title, content) {
@@ -66,6 +80,8 @@ export const useUserStoriesStore = defineStore("user-stories", {
 				status: STORY_STATUS.QUEUED,
 				infoMessages: [],
 			};
+
+			this.addToProcessingQueue();
 		},
 		async fetchDataforIds(listofIds = []) {
 			for (let storyId of listofIds) {
@@ -86,13 +102,7 @@ export const useUserStoriesStore = defineStore("user-stories", {
 				date: toIsoStringWithTimezone(new Date()),
 			});
 		},
-		processQueuedStories() {
-			console.log("Checking queued items...");
-			console.log(this.processingQueue);
-			// TODO: Add another mechanism here to check for new info messages for STATUS.PROCESSING
-
-			// below will check if queue is empty and add more items into queue
-
+		addToProcessingQueue() {
 			// Filter out already processing stories
 			const processingStories = Object.keys(this.items).filter(
 				(key) => this.items[key].status === STORY_STATUS.PROCESSING
@@ -100,51 +110,57 @@ export const useUserStoriesStore = defineStore("user-stories", {
 
 			// Calculate available slots in the queue
 			const availableSlots = this.maxQueueLength - processingStories.length;
+			if (availableSlots <= 0) return false;
 
-			if (availableSlots > 0) {
-				Object.entries(this.items).forEach(([key, story]) => {
-					if (
-						story.status === STORY_STATUS.QUEUED &&
-						this.processingQueue.length < this.maxQueueLength
-					) {
-						// Change the status to processing
-						this.items[key].status = STORY_STATUS.PROCESSING;
-						this.processingQueue.push(key);
+			for (let [storyId, storyData] of Object.entries(this.items)) {
+				if (this.processingQueue.length >= this.maxQueueLength) break;
 
-						// [TODO] processing and polling
-						// for now Simulate processing and removal from queue
-						setTimeout(
-							() => {
-								const testScenariosStore = useTestScenariosStore();
-
-								// Add fake response data to test scenarios store
-								testScenariosStore.addItem(
-									key,
-									"Description 123",
-									"Conditions 123",
-									"Steps 123",
-									"Results 123"
-								);
-								testScenariosStore.addItem(
-									key,
-									"Description 456",
-									"Conditions 456",
-									"Steps 456",
-									"Results 456"
-								);
-
-								// After processing, change the status (e.g., to 'done') and remove from the queue
-								this.items[key].status = STORY_STATUS.DONE; // Assuming 'done' is a status
-								this.processingQueue = this.processingQueue.filter(
-									(id) => id !== key
-								);
-							},
-							5000,
-							key
-						); // Simulated processing time
-					}
-				});
+				if (storyData.status === STORY_STATUS.QUEUED) {
+					// Change the status to processing
+					this.items[storyId].status = STORY_STATUS.PROCESSING;
+					this.processingQueue.push(storyId);
+				}
 			}
+		},
+		processQueuedStories() {
+			// TODO: Remove console.log in prod
+			console.log("Checking queued items...");
+			console.log(this.processingQueue);
+
+			for (let storyId of this.processingQueue) {
+				// TODO: Add mechanism here to check for new info messages for all stories being processed
+				// add those info messages into the store
+				// ---
+				// TODO: Add mechanism here to check if the test scenarios are completed generating.
+				// if test scenarios generation is completed, add to test scenarios store, remove from the processing queue, and set status to be done
+
+				// for now, we will mock the test scenario data
+				this.getGeneratedTestScenarios_fake(storyId);
+			}
+		},
+		async getGeneratedTestScenarios_fake(userStoryId) {
+			// assume success and we have the data now
+			const response = [
+				["Description 123", "Conditions 123", "Steps 123", "Results 123"],
+				["Description 456", "Conditions 456", "Steps 456", "Results 456"],
+			];
+
+			const testScenariosStore = useTestScenariosStore();
+
+			// Add fake response data to test scenarios store
+			for (let item of response) {
+				testScenariosStore.addItem(userStoryId, ...item);
+			}
+
+			// After processing, change the status (e.g., to 'done') and remove from the queue
+			console.log(userStoryId);
+			this.items[userStoryId].status = STORY_STATUS.DONE; // Assuming 'done' is a status
+			this.processingQueue = this.processingQueue.filter(
+				(id) => id !== userStoryId
+			);
+
+			// push other items for processing
+			this.addToProcessingQueue();
 		},
 	},
 });
