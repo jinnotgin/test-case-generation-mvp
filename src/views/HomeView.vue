@@ -53,8 +53,8 @@ function handleCloseModal() {
 	modalVisible_addStories.value = false;
 }
 function handleAddStories(data) {
-	// TODO
 	console.log(data);
+	userStories.fetchDataforIds(data);
 }
 </script>
 

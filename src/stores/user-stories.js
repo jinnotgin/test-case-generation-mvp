@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { toIsoStringWithTimezone } from "@/lib/utils.js";
+import { getJiraIssue } from "@/lib/api.js";
 
 // user story status: ready, queued, processing, success, error
 export const useUserStoriesStore = defineStore("user-stories", {
@@ -58,8 +59,19 @@ export const useUserStoriesStore = defineStore("user-stories", {
 		addItem(key, title, content) {
 			this.items[key] = { title, content, status: "ready", infoMessages: [] };
 		},
-		removeItem(key, title, content) {
+		removeItem(key) {
 			delete this.items[key];
+		},
+		async fetchDataforIds(listofIds = []) {
+			for (let storyId of listofIds) {
+				try {
+					const data = await getJiraIssue(storyId);
+					const { issueId, title, description } = data;
+					if (issueId) this.addItem(issueId, title, description);
+				} catch (error) {
+					console.error(`Unable to fetch data for ${storyId}`);
+				}
+			}
 		},
 		setItemAsProcessing(key) {
 			this.items[key].status = "processing";
