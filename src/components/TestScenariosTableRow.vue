@@ -51,7 +51,7 @@ function handleSelectClick(e) {
 </script>
 
 <template>
-	<tr class="align-top">
+	<tr class="align-top" @dblclick="handleEndEdit">
 		<td class="px-4 py-3">
 			<div class="inline-flex items-center gap-x-3">
 				<input
@@ -71,7 +71,7 @@ function handleSelectClick(e) {
 				placeholder="Description"
 				>{{ description }}</textarea
 			>
-			<p v-else class="whitespace-pre-line" @dblclick="handleStartEdit">
+			<p v-else class="whitespace-pre-line" @dblclick.stop="handleStartEdit">
 				{{ description }}
 			</p>
 		</td>
@@ -80,7 +80,7 @@ function handleSelectClick(e) {
 		>
 			<ul
 				class="whitespace-pre-line flex flex-col gap-2 list-none"
-				@dblclick="handleStartEdit"
+				@dblclick.stop="handleStartEdit"
 			>
 				<li>
 					<p class="underline">Pre-Conditions</p>
