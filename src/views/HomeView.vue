@@ -74,46 +74,48 @@ onUnmounted(() => {
 <template>
 	<main class="h-full">
 		<splitpanes class="default-theme">
-			<pane
-				size="25"
-				min-size="20"
-				class="flex flex-col gap-4 overflow-auto p-4"
-			>
-				<div class="flex justify-between items-center">
-					<h3 class="text-xl font-medium text-gray-800 dark:text-white">
-						User Stories
-					</h3>
-					<div class="flex gap-3">
+			<pane size="25" min-size="20">
+				<section class="p-4 flex flex-col gap-4 h-full overflow-auto">
+					<div class="flex justify-between items-center">
+						<h3 class="text-xl font-medium text-gray-800 dark:text-white">
+							User Stories
+						</h3>
+						<div class="flex gap-3">
+							<ButtonSmall
+								v-if="userStoriesCount > 0"
+								text="+ Add"
+								color="secondary"
+								@click="handleOpenModal"
+							/>
+						</div>
+					</div>
+					<EmptyPlaceholder
+						v-if="userStoriesCount === 0"
+						icon="book"
+						title="No user stories"
+						description="You have not added any user stories yet. Please add some to generate your test scenarios."
+					>
 						<ButtonSmall
-							v-if="userStoriesCount > 0"
 							text="+ Add"
-							color="secondary"
+							color="primary"
 							@click="handleOpenModal"
 						/>
-					</div>
-				</div>
-				<EmptyPlaceholder
-					v-if="userStoriesCount === 0"
-					icon="book"
-					title="No user stories"
-					description="You have not added any user stories yet. Please add some to generate your test scenarios."
-				>
-					<ButtonSmall text="+ Add" color="primary" @click="handleOpenModal" />
-				</EmptyPlaceholder>
-				<ul v-else class="list-none flex flex-col gap-2">
-					<li
-						v-for="({ title, status }, key) in userStories.items"
-						:key="key"
-						@click="handleUserStoryClick(key)"
-					>
-						<StoryCard
-							:storyId="key"
-							:title="title"
-							:status="status"
-							:active="currentUserStoryId === key"
-						/>
-					</li>
-				</ul>
+					</EmptyPlaceholder>
+					<ul v-else class="list-none flex flex-col gap-2">
+						<li
+							v-for="({ title, status }, key) in userStories.items"
+							:key="key"
+							@click="handleUserStoryClick(key)"
+						>
+							<StoryCard
+								:storyId="key"
+								:title="title"
+								:status="status"
+								:active="currentUserStoryId === key"
+							/>
+						</li>
+					</ul>
+				</section>
 			</pane>
 			<pane size="80" min-size="50">
 				<EmptyPlaceholder
