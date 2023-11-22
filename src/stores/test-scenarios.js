@@ -3,12 +3,11 @@ import { TEST_SCENARIO_STATUS } from "@/lib/constants.js";
 import { createTestScenario as api_createTestScenario } from "@/lib/api.js";
 
 export const useTestScenariosStore = defineStore("test-scenarios", {
-	state: () => ({
-		items: {
-			"SLS-8040": {
-				1700398085852: {
-					title: "Verify that the Game Story tab is displayed when clicked on",
-					description: `Pre-Conditions
+  state: () => ({
+    items: {
+      1700398085852: {
+        title: "Verify that the Game Story tab is displayed when clicked on",
+        description: `Pre-Conditions
 - User is logged in as a Teacher
 - User is viewing the course editor
 - User is viewing the gamification settings subpage
@@ -21,12 +20,13 @@ Expected Result
 - The subpage body shows the Game Story tab
 - Game Story details are shown
 `,
-					status: "draft",
-					issueId: null,
-				},
-				1700398134835: {
-					title: "Verify that the Add Game Story button is displayed",
-					description: `Pre-Conditions
+        status: "draft",
+        parentStoryId: "SLS-8040",
+        jiraIssueId: null,
+      },
+      1700398134835: {
+        title: "Verify that the Add Game Story button is displayed",
+        description: `Pre-Conditions
 - User is logged in as a Teacher
 - User is viewing the course editor
 - User is viewing the gamification settings subpage
@@ -38,64 +38,83 @@ Steps
 Expected Result
 - The Add Game Story button is displayed
 `,
-					status: "draft",
-					jiraIssueId: null,
-				},
-			},
-		},
-	}),
-	actions: {
-		addItem(storyId, title, description) {
-			if (!Object.keys(this.items).includes(storyId)) this.items[storyId] = {};
-			const testId = Math.floor(Date.now() * Math.random() * 10);
+        status: "draft",
+        parentStoryId: "SLS-8040",
+        jiraIssueId: null,
+      },
+    },
+    syncingItems: new Set([]), // TODO: stub for future effort to sync CRUD with backend
+  }),
+  getters: {
+    getTestsByStoryId: (state) => {
+      return (storyId) => {
+        // TOOD: consider adding a cache. but with cache, need to invalidate when CRUD happen
+        // TODO: another way is to use a Proxy, but thats more complicated
+        const relevantItems = Object.entries(state.items).reduce(
+          (acc, [testId, testData]) => {
+            if (testData.parentStoryId === storyId) {
+              acc[testId] = testData;
+            }
+            return acc;
+          },
+          {}
+        );
+        return relevantItems;
+      };
+    },
+  },
+  actions: {
+    addItem(title, description, storyId) {
+      const testId = Math.floor(Date.now() * Math.random() * 10);
 
-			this.items[storyId][testId] = {
-				id: testId,
-				title,
-				description,
-				status: TEST_SCENARIO_STATUS.DRAFT,
-				jiraIssueId: null,
-			};
-		},
-		deleteItem(storyId, testId) {
-			delete this.items[storyId][testId];
-		},
-		setItemTitle(storyId, testId, newValue) {
-			this.items[storyId][testId].title = newValue;
-		},
-		setItemDescription(storyId, testId, newValue) {
-			this.items[storyId][testId].description = newValue;
-		},
-		setItemStatus(storyId, testId, newValue) {
-			this.items[storyId][testId].status = newValue;
-		},
-		setItemJiraIssueId(storyId, testId, newValue) {
-			this.items[storyId][testId].jiraIssueId = newValue;
-		},
-		async createTestScenario(storyId, testId) {
-			try {
-				const testData = this.items[storyId][testId];
-				const { title, description, status } = testData;
+      this.items[testId] = {
+        id: testId,
+        title,
+        description,
+        status: TEST_SCENARIO_STATUS.DRAFT,
+        parentStoryId: storyId,
+        jiraIssueId: null,
+      };
+    },
+    deleteItem(testId) {
+      delete this.items[testId];
+    },
+    setItemTitle(testId, newValue) {
+      this.items[testId].title = newValue;
+    },
+    setItemDescription(testId, newValue) {
+      this.items[testId].description = newValue;
+    },
+    setItemStatus(testId, newValue) {
+      this.items[testId].status = newValue;
+    },
+    setItemJiraIssueId(testId, newValue) {
+      this.items[testId].jiraIssueId = newValue;
+    },
+    async createTestScenario(testId) {
+      try {
+        const testData = this.items[testId];
+        const { title, description, status } = testData;
 
-				if (status !== TEST_SCENARIO_STATUS.DRAFT) return false;
+        if (status !== TEST_SCENARIO_STATUS.DRAFT) return false;
 
-				this.setItemStatus(storyId, testId, TEST_SCENARIO_STATUS.PROCESSING);
-				const response = await api_createTestScenario(
-					storyId,
-					title,
-					description
-				);
+        this.setItemStatus(testId, TEST_SCENARIO_STATUS.PROCESSING);
+        const response = await api_createTestScenario(
+          storyId,
+          title,
+          description
+        );
 
-				if (response.status && response.testScenarioId) {
-					this.setItemStatus(storyId, testId, TEST_SCENARIO_STATUS.SUBMITTED);
-					this.setItemJiraIssueId(storyId, testId, response.testScenarioId);
-				} else {
-					this.setItemStatus(storyId, testId, TEST_SCENARIO_STATUS.DRAFT);
-				}
-			} catch (error) {
-				this.setItemStatus(storyId, testId, TEST_SCENARIO_STATUS.DRAFT);
-				console.error("Error creating test scenario", testId, error);
-			}
-		},
-	},
+        if (response.status && response.testScenarioId) {
+          this.setItemStatus(testId, TEST_SCENARIO_STATUS.SUBMITTED);
+          this.setItemJiraIssueId(testId, response.testScenarioId);
+        } else {
+          this.setItemStatus(testId, TEST_SCENARIO_STATUS.DRAFT);
+        }
+      } catch (error) {
+        this.setItemStatus(testId, TEST_SCENARIO_STATUS.DRAFT);
+        console.error("Error creating test scenario", testId, error);
+      }
+    },
+  },
 });

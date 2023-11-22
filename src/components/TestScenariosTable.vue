@@ -9,7 +9,7 @@ const props = defineProps(["userStoryId"]);
 
 const store = useTestScenariosStore();
 const items = computed(() => {
-	return store.items[props.userStoryId];
+	return store.getTestsByStoryId(props.userStoryId);
 });
 const itemsCount = computed(() => {
 	return items.value ? Object.keys(items.value).length : 0;
@@ -49,12 +49,12 @@ function handleEndEdit(testId) {
 
 function handleDelete(testId) {
 	const confirmDelete = confirm("Are you sure?");
-	if (confirmDelete) store.deleteItem(props.userStoryId, testId);
+	if (confirmDelete) store.deleteItem(testId);
 }
 
 async function handleSubmit() {
 	for (let testId of selected.value) {
-		await store.createTestScenario(props.userStoryId, testId);
+		await store.createTestScenario(testId);
 		handleDeselect(testId);
 	}
 }

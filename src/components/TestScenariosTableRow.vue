@@ -15,16 +15,16 @@ const props = defineProps({
 });
 
 const store = useTestScenariosStore();
-const testCaseData = store.items[props.userStoryId][props.testId];
+const testCaseData = store.items[props.testId];
 
 const titleValue = computed({
 	get: () => testCaseData.title,
-	set: (value) => store.setItemTitle(props.userStoryId, props.testId, value),
+	set: (value) => store.setItemTitle(props.testId, value),
 });
 const descriptionValue = computed({
 	get: () => testCaseData.description,
 	set: (value) =>
-		store.setItemDescription(props.userStoryId, props.testId, value),
+		store.setItemDescription(props.testId, value),
 });
 
 const emit = defineEmits([
