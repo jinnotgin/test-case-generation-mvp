@@ -4,8 +4,6 @@ import Row from "@/components/TestScenariosTableRow.vue";
 import ButtonSmall from "@/components/ButtonSmall.vue";
 import EmptyPlaceholder from "@/components/EmptyPlaceholder.vue";
 import { useTestScenariosStore } from "@/stores/test-scenarios";
-import { createTestScenario as api_createTestScenario } from "@/lib/api.js";
-import { TEST_SCENARIO_STATUS } from "../lib/constants";
 
 const props = defineProps(["userStoryId"]);
 
