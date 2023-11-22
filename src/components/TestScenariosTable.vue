@@ -4,48 +4,61 @@ import Row from "@/components/TestScenariosTableRow.vue";
 import ButtonSmall from "@/components/ButtonSmall.vue";
 import EmptyPlaceholder from "@/components/EmptyPlaceholder.vue";
 import { useTestScenariosStore } from "@/stores/test-scenarios";
+import { createTestScenario as api_createTestScenario } from "@/lib/api.js";
+import { TEST_SCENARIO_STATUS } from "../lib/constants";
 
-const props = defineProps(["userStoryId", "items"]);
-const itemsCount = computed(() => {
-	return props.items ? Object.keys(props.items).length : 0;
-});
+const props = defineProps(["userStoryId"]);
 
 const store = useTestScenariosStore();
+const items = computed(() => {
+	return store.items[props.userStoryId];
+});
+const itemsCount = computed(() => {
+	return items.value ? Object.keys(items.value).length : 0;
+});
 
 const selected = ref(new Set([]));
-function handleSelect(testCaseId) {
-	selected.value.add(testCaseId);
+function handleSelect(testId) {
+	selected.value.add(testId);
 }
-function handleDeselect(testCaseId) {
-	selected.value.delete(testCaseId);
+function handleDeselect(testId) {
+	selected.value.delete(testId);
 }
-const allItemsSelected = computed(() => {
-	const testCasesIds = Object.keys(store.items[props.userStoryId]);
-	const totalCount = testCasesIds.length;
+const ALL_ITEMS_ARE_SELECTED = computed(() => {
+	const testIds = Object.keys(items.value);
+	const totalCount = testIds.length;
 
 	const selectedCount = selected.value.size;
 
 	return selectedCount === totalCount;
 });
 function toggleSelectAll() {
-	const testCasesIds = Object.keys(store.items[props.userStoryId]);
+	const testIds = Object.keys(items.value);
 
-	if (allItemsSelected.value) selected.value.clear();
+	if (ALL_ITEMS_ARE_SELECTED.value) selected.value.clear();
 	else {
-		for (let id of testCasesIds) handleSelect(id);
+		for (let id of testIds) handleSelect(id);
 	}
 }
 
 const beingEdited = ref(new Set([]));
-function handleStartEdit(testCaseId) {
-	beingEdited.value.add(testCaseId);
+function handleStartEdit(testId) {
+	beingEdited.value.add(testId);
 }
-function handleEndEdit(testCaseId) {
-	beingEdited.value.delete(testCaseId);
+function handleEndEdit(testId) {
+	beingEdited.value.delete(testId);
 }
 
-function handleDelete(testCaseId) {
-	store.deleteItem(props.userStoryId, testCaseId);
+function handleDelete(testId) {
+	const confirmDelete = confirm("Are you sure?");
+	if (confirmDelete) store.deleteItem(props.userStoryId, testId);
+}
+
+async function handleSubmit() {
+	for (let testId of selected.value) {
+		await store.createTestScenario(props.userStoryId, testId);
+		handleDeselect(testId);
+	}
 }
 
 watch(
@@ -77,6 +90,7 @@ watch(
 				color="primary"
 				text="Submit"
 				:disabled="selected.size === 0"
+				@click="handleSubmit"
 			/>
 		</div>
 
@@ -109,7 +123,7 @@ watch(
 											<input
 												type="checkbox"
 												class="text-blue-500 border-gray-300 rounded dark:bg-gray-900 dark:ring-offset-gray-900 dark:border-gray-700"
-												:checked="allItemsSelected"
+												:checked="ALL_ITEMS_ARE_SELECTED"
 												@click="toggleSelectAll"
 											/>
 										</div>
@@ -147,18 +161,17 @@ watch(
 							<tbody
 								class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900"
 								v-for="(
-									{ description, conditions, steps, result, status }, key
+									{ title, description, status, jiraIssueId }, key
 								) in items"
 								:key="key"
 							>
 								<Row
 									:userStoryId="userStoryId"
 									:testId="key"
+									:title="title"
 									:description="description"
-									:conditions="conditions"
-									:steps="steps"
-									:result="result"
 									:status="status"
+									:jiraIssueId="jiraIssueId"
 									:editing="beingEdited.has(key)"
 									:checked="selected.has(key)"
 									@start-edit="handleStartEdit"

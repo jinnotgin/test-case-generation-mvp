@@ -1,13 +1,18 @@
 import { defineStore } from "pinia";
 import { toIsoStringWithTimezone } from "@/lib/utils.js";
-import { getJiraIssue } from "@/lib/api.js";
+import {
+	addJob as api_addJob,
+	getJobStatus as api_getJobStatus,
+	getJobOutput as api_getJobOutput,
+} from "@/lib/api.js";
 import { useTestScenariosStore } from "@/stores/test-scenarios.js";
-import { STORY_STATUS } from "@/lib/constants.js";
+import { STORY_STATUS, API_JOB_STATUS } from "@/lib/constants.js";
 
 export const useUserStoriesStore = defineStore("user-stories", {
 	state: () => ({
 		items: {
 			"SLS-8040": {
+				jobId: "sample1",
 				title:
 					"As a user, able to browse Gamified course from cards and table listing",
 				content: "",
@@ -48,6 +53,7 @@ export const useUserStoriesStore = defineStore("user-stories", {
 				],
 			},
 			"SLS-8698": {
+				jobId: "sample2",
 				title:
 					"As Teacher, toggle Game Team leaderboard functionality for assignees (ie students) (via Assignment Monitoring - Gamification)",
 				content: "",
@@ -55,6 +61,7 @@ export const useUserStoriesStore = defineStore("user-stories", {
 				infoMessages: [],
 			},
 			"SLS-7723": {
+				jobId: "sample3",
 				title:
 					"As Teacher, upon deletion of checkpoint, awarded checkpoints will be deleted in student consumption",
 				content: "",
@@ -62,6 +69,7 @@ export const useUserStoriesStore = defineStore("user-stories", {
 				infoMessages: [],
 			},
 			"SLS-8788": {
+				jobId: "sample4",
 				title:
 					"As Teacher, only add up to a maximum of 100 Game Teams per Assignment in an assigned Lesson / Course (Assignment) (Max Limit)",
 				content: "",
@@ -73,36 +81,37 @@ export const useUserStoriesStore = defineStore("user-stories", {
 		maxQueueLength: 1, // configurable queue length
 	}),
 	actions: {
-		addItem(key, title, content) {
-			this.items[key] = {
+		async startProcessing(listofIds = []) {
+			for (let storyId of listofIds) {
+				try {
+					const data = await api_addJob(storyId);
+					const { jobId, issueId, title, content } = data;
+					if (jobId) this.addItem(issueId, jobId, title, content);
+				} catch (error) {
+					console.error(`Unable to start a new job for ${storyId}`);
+				}
+			}
+		},
+		addItem(itemId, jobId, title, content) {
+			this.items[itemId] = {
+				jobId,
 				title,
 				content,
 				status: STORY_STATUS.QUEUED,
 				infoMessages: [],
 			};
 
-			this.addToProcessingQueue();
+			this.shiftToProcessingQueue();
 		},
-		async fetchDataforIds(listofIds = []) {
-			for (let storyId of listofIds) {
-				try {
-					const data = await getJiraIssue(storyId);
-					const { issueId, title, description } = data;
-					if (issueId) this.addItem(issueId, title, description);
-				} catch (error) {
-					console.error(`Unable to fetch data for ${storyId}`);
-				}
-			}
-		},
-		addInfoMessageToItem(key, type, title, description) {
-			this.items[key].infoMessages.push({
+		addInfoMessageToItem(itemId, type, title, description) {
+			this.items[itemId].infoMessages.push({
 				type,
 				title,
 				description,
 				date: toIsoStringWithTimezone(new Date()),
 			});
 		},
-		addToProcessingQueue() {
+		shiftToProcessingQueue() {
 			// Filter out already processing stories
 			const processingStories = Object.keys(this.items).filter(
 				(key) => this.items[key].status === STORY_STATUS.PROCESSING
@@ -115,34 +124,65 @@ export const useUserStoriesStore = defineStore("user-stories", {
 			for (let [storyId, storyData] of Object.entries(this.items)) {
 				if (this.processingQueue.length >= this.maxQueueLength) break;
 
-				if (storyData.status === STORY_STATUS.QUEUED) {
+				const { status, jobId } = storyData;
+
+				if (status === STORY_STATUS.QUEUED) {
 					// Change the status to processing
 					this.items[storyId].status = STORY_STATUS.PROCESSING;
-					this.processingQueue.push(storyId);
+					this.processingQueue.push({ storyId, jobId });
 				}
 			}
 		},
-		processQueuedStories() {
+		removeFromProcessingQueue(targetStoryId) {
+			this.processingQueue = this.processingQueue.filter(
+				({ storyId }) => storyId !== targetStoryId
+			);
+		},
+		async checkQueuedStories() {
 			// TODO: Remove console.log in prod
 			console.log("Checking queued items...");
 			console.log(this.processingQueue);
 
-			for (let storyId of this.processingQueue) {
-				// TODO: Add mechanism here to check for new info messages for all stories being processed
-				// add those info messages into the store
-				// ---
-				// TODO: Add mechanism here to check if the test scenarios are completed generating.
-				// if test scenarios generation is completed, add to test scenarios store, remove from the processing queue, and set status to be done
-
-				// for now, we will mock the test scenario data
+			for (let { storyId, jobId } of this.processingQueue) {
+				// TODO: for now, we will mock the test scenario data. remove in prod.
 				this.getGeneratedTestScenarios_fake(storyId);
+
+				const currentTime = Date.now();
+				const data = await api_getJobStatus(jobId, currentTime);
+				const { status = null, messages } = data;
+
+				if (status === null || status === API_JOB_STATUS.STALLED) {
+					this.setItemStatus(STORY_STATUS.ERROR);
+					return false;
+				}
+
+				for (let messageData of messages) {
+					const { type, title, description } = messageData;
+					this.addInfoMessageToItem(storyId, type, title, description);
+				}
+
+				if (status === API_JOB_STATUS.COMPLETED) {
+					const data = api_getJobOutput(jobId);
+					const { generatedTestScenarios = [] } = data;
+
+					for (let testScenarioData of generatedTestScenarios) {
+						const { title, description } = testScenarioData;
+						testScenariosStore.addItem(userStoryId, title, description);
+					}
+
+					this.removeFromProcessingQueue(storyId);
+					this.shiftToProcessingQueue();
+				}
 			}
+		},
+		setItemStatus(itemId, newStatus) {
+			this.items[itemId].status = newStatus;
 		},
 		async getGeneratedTestScenarios_fake(userStoryId) {
 			// assume success and we have the data now
 			const response = [
-				["Description 123", "Conditions 123", "Steps 123", "Results 123"],
-				["Description 456", "Conditions 456", "Steps 456", "Results 456"],
+				["Description 123", "Conditions 123\n\nSteps 123\n\nResults 123"],
+				["Description 123", "Conditions 456\n\nSteps 456\n\nResults 456"],
 			];
 
 			const testScenariosStore = useTestScenariosStore();
@@ -155,12 +195,10 @@ export const useUserStoriesStore = defineStore("user-stories", {
 			// After processing, change the status (e.g., to 'done') and remove from the queue
 			console.log(userStoryId);
 			this.items[userStoryId].status = STORY_STATUS.DONE; // Assuming 'done' is a status
-			this.processingQueue = this.processingQueue.filter(
-				(id) => id !== userStoryId
-			);
+			this.removeFromProcessingQueue(userStoryId);
 
 			// push other items for processing
-			this.addToProcessingQueue();
+			this.shiftToProcessingQueue();
 		},
 	},
 });

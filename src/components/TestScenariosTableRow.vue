@@ -2,14 +2,14 @@
 import { computed } from "vue";
 import VueFeather from "vue-feather";
 import { useTestScenariosStore } from "@/stores/test-scenarios";
+import { JIRA_ISSUE_URL, TEST_SCENARIO_STATUS } from "@/lib/constants.js";
 const props = defineProps({
 	userStoryId: String,
 	testId: String,
+	title: String,
 	description: String,
-	conditions: String,
-	steps: String,
-	result: String,
 	status: String,
+	jiraIssueId: String,
 	editing: Boolean,
 	checked: Boolean,
 });
@@ -17,23 +17,14 @@ const props = defineProps({
 const store = useTestScenariosStore();
 const testCaseData = store.items[props.userStoryId][props.testId];
 
+const titleValue = computed({
+	get: () => testCaseData.title,
+	set: (value) => store.setItemTitle(props.userStoryId, props.testId, value),
+});
 const descriptionValue = computed({
 	get: () => testCaseData.description,
 	set: (value) =>
 		store.setItemDescription(props.userStoryId, props.testId, value),
-});
-const conditionsValue = computed({
-	get: () => testCaseData.conditions,
-	set: (value) =>
-		store.setItemConditions(props.userStoryId, props.testId, value),
-});
-const stepsValue = computed({
-	get: () => testCaseData.steps,
-	set: (value) => store.setItemSteps(props.userStoryId, props.testId, value),
-});
-const resultValue = computed({
-	get: () => testCaseData.result,
-	set: (value) => store.setItemResult(props.userStoryId, props.testId, value),
 });
 
 const emit = defineEmits([
@@ -57,6 +48,10 @@ function handleSelectClick(e) {
 function handleDelete() {
 	emit("delete", props.testId);
 }
+
+const currentJiraIssueUrl = computed(() => {
+	return JIRA_ISSUE_URL.replace("{0}", jiraIssueId);
+});
 </script>
 
 <template>
@@ -74,64 +69,39 @@ function handleDelete() {
 		<td class="px-4 py-3 text-sm font-medium text-gray-700 whitespace-nowrap">
 			<textarea
 				v-if="editing"
-				v-model="descriptionValue"
+				v-model="titleValue"
 				class="py-2 px-3 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400 dark:focus:ring-gray-600"
 				rows="5"
-				placeholder="Description"
-				>{{ description }}</textarea
+				placeholder="Title"
+				>{{ title }}</textarea
 			>
 			<p v-else class="whitespace-pre-line" @dblclick.stop="handleStartEdit">
-				{{ description }}
+				{{ title }}
 			</p>
 		</td>
 		<td
 			class="px-4 py-3 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"
 		>
-			<ul
+			<div
 				class="whitespace-pre-line flex flex-col gap-2 list-none"
 				@dblclick.stop="handleStartEdit"
 			>
-				<li>
-					<p class="underline">Pre-Conditions</p>
-					<textarea
-						v-if="editing"
-						v-model="conditionsValue"
-						class="py-2 px-3 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400 dark:focus:ring-gray-600"
-						rows="5"
-						placeholder="Conditions"
-						>{{ conditions }}</textarea
-					>
-					<p v-else>{{ conditions }}</p>
-				</li>
-				<li>
-					<p class="underline">Steps</p>
-					<textarea
-						v-if="editing"
-						v-model="stepsValue"
-						class="py-2 px-3 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400 dark:focus:ring-gray-600"
-						rows="5"
-						placeholder="Steps"
-						>{{ steps }}</textarea
-					>
-					<p v-else>{{ steps }}</p>
-				</li>
-				<li>
-					<p class="underline">Expected Results</p>
-					<textarea
-						v-if="editing"
-						v-model="resultValue"
-						class="py-2 px-3 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400 dark:focus:ring-gray-600"
-						rows="5"
-						placeholder="Expected Result"
-						>{{ result }}</textarea
-					>
-					<p v-else>{{ result }}</p>
-				</li>
-			</ul>
+				<textarea
+					v-if="editing"
+					v-model="descriptionValue"
+					class="py-2 px-3 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400 dark:focus:ring-gray-600"
+					rows="15"
+					placeholder="Description"
+					>{{ description }}</textarea
+				>
+				<p v-else>{{ description }}</p>
+			</div>
 		</td>
-		<td class="px-12 py-3 text-sm text-gray-700 whitespace-nowrap">
+		<td
+			class="px-12 py-3 text-sm text-gray-700 whitespace-nowrap flex flex-col items-center gap-2"
+		>
 			<div
-				v-if="status === 'draft'"
+				v-if="status === TEST_SCENARIO_STATUS.DRAFT"
 				class="inline-flex items-center px-3 py-1 rounded-full gap-x-2 bg-blue-100/60 dark:bg-gray-800"
 			>
 				<h2 class="text-sm font-normal text-blue-500 capitalize">
@@ -139,13 +109,27 @@ function handleDelete() {
 				</h2>
 			</div>
 			<div
-				v-else-if="status === 'submitted'"
+				v-else-if="status === TEST_SCENARIO_STATUS.PROCESSING"
+				class="inline-flex items-center px-3 py-1 rounded-full gap-x-2 bg-yellow-100/60 dark:bg-gray-800"
+			>
+				<h2 class="text-sm font-normal text-yellow-600 capitalize">
+					{{ status }}
+				</h2>
+			</div>
+			<div
+				v-else-if="status === TEST_SCENARIO_STATUS.SUBMITTED"
 				class="inline-flex items-center px-3 py-1 rounded-full gap-x-2 bg-emerald-100/60 dark:bg-gray-800"
 			>
 				<h2 class="text-sm font-normal text-emerald-500 capitalize">
 					{{ status }}
 				</h2>
 			</div>
+
+			<a
+				v-if:="status === TEST_SCENARIO_STATUS.SUBMITTED"
+				:href="currentJiraIssueUrl"
+				>{{ jiraIssueId }}</a
+			>
 		</td>
 		<td class="px-4 py-4 text-sm whitespace-nowrap">
 			<div class="flex items-center gap-x-6">

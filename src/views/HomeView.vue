@@ -9,22 +9,23 @@ import AlertInline from "@/components/AlertInline.vue";
 import ButtonSmall from "@/components/ButtonSmall.vue";
 import ModalAddStories from "@/components/ModalAddStories.vue";
 import EmptyPlaceholder from "@/components/EmptyPlaceholder.vue";
+import { JIRA_ISSUE_URL } from "@/lib/constants.js";
 
 import { useUserStoriesStore } from "@/stores/user-stories";
 import { useTestScenariosStore } from "@/stores/test-scenarios";
 
-const userStories = useUserStoriesStore();
-const testScenarios = useTestScenariosStore();
+const userStoriesStore = useUserStoriesStore();
+const testScenariosStore = useTestScenariosStore();
 
 const userStoriesCount = computed(() => {
-	return userStories && userStories.items
-		? Object.keys(userStories.items).length
+	return userStoriesStore && userStoriesStore.items
+		? Object.keys(userStoriesStore.items).length
 		: 0;
 });
 
 const currentUserStoryId = ref(null);
 if (userStoriesCount.value > 0) {
-	currentUserStoryId.value = Object.keys(userStories.items)[0];
+	currentUserStoryId.value = Object.keys(userStoriesStore.items)[0];
 }
 
 function handleUserStoryClick(key) {
@@ -32,7 +33,7 @@ function handleUserStoryClick(key) {
 }
 const currentUserStoryData = computed(() => {
 	return currentUserStoryId && currentUserStoryId.value
-		? userStories.items[currentUserStoryId.value]
+		? userStoriesStore.items[currentUserStoryId.value]
 		: null;
 });
 const currentUserStoryInfoMessages = computed(() => {
@@ -41,8 +42,8 @@ const currentUserStoryInfoMessages = computed(() => {
 		: [];
 });
 
-const currentIssueUrl = computed(() => {
-	return `https://jira.sls.ufinity.com/browse/${currentUserStoryId.value}`;
+const currentJiraIssueUrl = computed(() => {
+	return JIRA_ISSUE_URL.replace("{0}", currentUserStoryId.value);
 });
 
 const modalVisible_addStories = ref(false);
@@ -54,13 +55,13 @@ function handleCloseModal() {
 }
 function handleAddStories(data) {
 	console.log(data);
-	userStories.fetchDataforIds(data);
+	userStoriesStore.startProcessing(data);
 }
 
 let intervalId = null;
 const startPolling = () => {
 	intervalId = setInterval(() => {
-		userStories.processQueuedStories();
+		userStoriesStore.checkQueuedStories();
 	}, 5000); // Poll every 5 seconds
 };
 onMounted(startPolling);
@@ -71,7 +72,7 @@ onUnmounted(() => {
 });
 
 // TODO: Remove this from production (this is only for mock data)
-userStories.addToProcessingQueue();
+userStoriesStore.shiftToProcessingQueue();
 </script>
 
 <template>
@@ -106,7 +107,7 @@ userStories.addToProcessingQueue();
 					</EmptyPlaceholder>
 					<ul v-else class="list-none flex flex-col gap-2">
 						<li
-							v-for="({ title, status }, key) in userStories.items"
+							v-for="({ title, status }, key) in userStoriesStore.items"
 							:key="key"
 							@click="handleUserStoryClick(key)"
 						>
@@ -124,7 +125,7 @@ userStories.addToProcessingQueue();
 				<EmptyPlaceholder
 					v-if="
 						currentUserStoryId === null ||
-						!Object.keys(userStories.items).includes(currentUserStoryId)
+						!Object.keys(userStoriesStore.items).includes(currentUserStoryId)
 					"
 					icon="arrow-left"
 					title="Click on a user story to begin"
@@ -139,7 +140,7 @@ userStories.addToProcessingQueue();
 								<div class="flex">
 									<p>
 										<a
-											:href="currentIssueUrl"
+											:href="currentJiraIssueUrl"
 											class="font-bold hover:text-gray-600 dark:hover:text-gray-200 hover:underline"
 											tabindex="0"
 											role="link"
@@ -149,13 +150,7 @@ userStories.addToProcessingQueue();
 								</div>
 							</div>
 						</div>
-						<TestScenariosTable
-							:userStoryId="currentUserStoryId"
-							:items="
-								currentUserStoryId
-									? testScenarios.items[currentUserStoryId]
-									: {}
-							"
+						<TestScenariosTable :userStoryId="currentUserStoryId"
 					/></pane>
 					<pane size="35" class="flex flex-col gap-2"
 						><div
