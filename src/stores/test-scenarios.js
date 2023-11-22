@@ -54,7 +54,7 @@ Expected Result
 				title,
 				description,
 				status: TEST_SCENARIO_STATUS.DRAFT,
-				issueId: null,
+				jiraIssueId: null,
 			};
 		},
 		deleteItem(storyId, testId) {
