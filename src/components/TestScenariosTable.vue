@@ -44,6 +44,10 @@ function handleEndEdit(testCaseId) {
 	beingEdited.value.delete(testCaseId);
 }
 
+function handleDelete(testCaseId) {
+	store.deleteItem(props.userStoryId, testCaseId);
+}
+
 watch(
 	() => props.userStoryId,
 	(newValue, oldValue) => {
@@ -161,6 +165,7 @@ watch(
 									@end-edit="handleEndEdit"
 									@select="handleSelect"
 									@deselect="handleDeselect"
+									@delete="handleDelete"
 								/>
 							</tbody>
 						</table>

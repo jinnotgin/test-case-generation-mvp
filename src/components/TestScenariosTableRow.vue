@@ -36,7 +36,13 @@ const resultValue = computed({
 	set: (value) => store.setItemResult(props.userStoryId, props.testId, value),
 });
 
-const emit = defineEmits(["start-edit", "end-edit", "select", "deselect"]);
+const emit = defineEmits([
+	"start-edit",
+	"end-edit",
+	"select",
+	"deselect",
+	"delete",
+]);
 function handleStartEdit() {
 	emit("start-edit", props.testId);
 }
@@ -47,6 +53,9 @@ function handleSelectClick(e) {
 	const isChecked = e.target.checked;
 	if (isChecked) emit("select", props.testId);
 	else emit("deselect", props.testId);
+}
+function handleDelete() {
+	emit("delete", props.testId);
 }
 </script>
 
@@ -142,6 +151,7 @@ function handleSelectClick(e) {
 			<div class="flex items-center gap-x-6">
 				<button
 					class="text-gray-500 transition-colors duration-200 dark:hover:text-red-500 dark:text-gray-300 hover:text-red-500 focus:outline-none"
+					@click="handleDelete"
 				>
 					<vue-feather type="trash" size="20" class="w-5 h-5" />
 				</button>
