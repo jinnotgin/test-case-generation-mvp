@@ -131,7 +131,7 @@ watch(
 										class="py-3.5 px-4 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 w-1/3"
 									>
 										<div class="flex items-center gap-x-3">
-											<span>Description</span>
+											<span>Title</span>
 										</div>
 									</th>
 
@@ -140,7 +140,7 @@ watch(
 										class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 w-1/2"
 									>
 										<button class="flex items-center gap-x-2">
-											<span>Details</span>
+											<span>Description</span>
 										</button>
 									</th>
 									<th
