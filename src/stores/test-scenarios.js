@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { TEST_SCENARIO_STATUS } from "@/lib/constants.js";
-import { createTestScenario as api_createTestScenario } from "@/lib/api.js";
+import { createJiraTest as api_createJiraTest } from "@/lib/api.js";
 
 export const useTestScenariosStore = defineStore("test-scenarios", {
   state: () => ({
@@ -20,9 +20,9 @@ Expected Result
 - The subpage body shows the Game Story tab
 - Game Story details are shown
 `,
-        status: "draft",
+        status: "published",
         parentStoryId: "SLS-8040",
-        jiraIssueId: null,
+        jiraTestId: "SLSTESTAI-0000",
       },
       1700398134835: {
         title: "Verify that the Add Game Story button is displayed",
@@ -40,7 +40,7 @@ Expected Result
 `,
         status: "draft",
         parentStoryId: "SLS-8040",
-        jiraIssueId: null,
+        jiraTestId: null,
       },
     },
     syncingItems: new Set([]), // TODO: stub for future effort to sync CRUD with backend
@@ -73,7 +73,7 @@ Expected Result
         description,
         status: TEST_SCENARIO_STATUS.DRAFT,
         parentStoryId: storyId,
-        jiraIssueId: null,
+        jiraTestId: null,
       };
     },
     deleteItem(testId) {
@@ -88,10 +88,10 @@ Expected Result
     setItemStatus(testId, newValue) {
       this.items[testId].status = newValue;
     },
-    setItemJiraIssueId(testId, newValue) {
-      this.items[testId].jiraIssueId = newValue;
+    setItemjiraTestId(testId, newValue) {
+      this.items[testId].jiraTestId = newValue;
     },
-    async createTestScenario(testId) {
+    async publishItem(testId) {
       try {
         const testData = this.items[testId];
         const { title, description, status } = testData;
@@ -99,11 +99,11 @@ Expected Result
         if (status !== TEST_SCENARIO_STATUS.DRAFT) return false;
 
         this.setItemStatus(testId, TEST_SCENARIO_STATUS.PROCESSING);
-        const response = await api_createTestScenario(title, description);
+        const response = await api_createJiraTest(title, description);
 
         if (response.status && response.testScenarioId) {
-          this.setItemStatus(testId, TEST_SCENARIO_STATUS.SUBMITTED);
-          this.setItemJiraIssueId(testId, response.testScenarioId);
+          this.setItemStatus(testId, TEST_SCENARIO_STATUS.PUBLISHED);
+          this.setItemjiraTestId(testId, response.testScenarioId);
         } else {
           this.setItemStatus(testId, TEST_SCENARIO_STATUS.DRAFT);
         }

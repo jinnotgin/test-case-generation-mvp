@@ -9,7 +9,7 @@ const props = defineProps({
 	title: String,
 	description: String,
 	status: String,
-	jiraIssueId: String,
+	jiraTestId: String,
 	editing: Boolean,
 	checked: Boolean,
 });
@@ -35,6 +35,7 @@ const emit = defineEmits([
 	"delete",
 ]);
 function handleStartEdit() {
+	if (props.status !== TEST_SCENARIO_STATUS.DRAFT) return false;
 	emit("start-edit", props.testId);
 }
 function handleEndEdit() {
@@ -50,7 +51,7 @@ function handleDelete() {
 }
 
 const currentJiraIssueUrl = computed(() => {
-	return JIRA_ISSUE_URL.replace("{0}", jiraIssueId);
+	return JIRA_ISSUE_URL.replace("{0}", props.jiraTestId);
 });
 </script>
 
@@ -98,7 +99,7 @@ const currentJiraIssueUrl = computed(() => {
 			</div>
 		</td>
 		<td
-			class="px-12 py-3 text-sm text-gray-700 whitespace-nowrap flex flex-col items-center gap-2"
+			class="px-12 py-3 text-sm text-gray-700 whitespace-nowrap"
 		>
 			<div
 				v-if="status === TEST_SCENARIO_STATUS.DRAFT"
@@ -117,22 +118,16 @@ const currentJiraIssueUrl = computed(() => {
 				</h2>
 			</div>
 			<div
-				v-else-if="status === TEST_SCENARIO_STATUS.SUBMITTED"
+				v-else-if="status === TEST_SCENARIO_STATUS.PUBLISHED"
 				class="inline-flex items-center px-3 py-1 rounded-full gap-x-2 bg-emerald-100/60 dark:bg-gray-800"
 			>
 				<h2 class="text-sm font-normal text-emerald-500 capitalize">
 					{{ status }}
 				</h2>
 			</div>
-
-			<a
-				v-if:="status === TEST_SCENARIO_STATUS.SUBMITTED"
-				:href="currentJiraIssueUrl"
-				>{{ jiraIssueId }}</a
-			>
 		</td>
-		<td class="px-4 py-4 text-sm whitespace-nowrap">
-			<div class="flex items-center gap-x-6">
+		<td class="px-4 py-4 whitespace-nowrap">
+			<div v-if="status !== TEST_SCENARIO_STATUS.PUBLISHED" class="flex items-center justify-end gap-x-6">
 				<button
 					class="text-gray-500 transition-colors duration-200 dark:hover:text-red-500 dark:text-gray-300 hover:text-red-500 focus:outline-none"
 					@click="handleDelete"
@@ -155,6 +150,12 @@ const currentJiraIssueUrl = computed(() => {
 					<vue-feather type="check" size="20" class="w-5 h-5" />
 				</button>
 			</div>
+			<a
+				v-else
+				class="text-xs align-top"
+				:href="currentJiraIssueUrl"
+				>{{ jiraTestId }}</a
+			>
 		</td>
 	</tr>
 </template>

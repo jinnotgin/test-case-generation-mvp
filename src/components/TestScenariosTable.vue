@@ -52,9 +52,10 @@ function handleDelete(testId) {
 	if (confirmDelete) store.deleteItem(testId);
 }
 
-async function handleSubmit() {
+async function handlePublish() {
 	for (let testId of selected.value) {
-		await store.createTestScenario(testId);
+		handleEndEdit(testId);
+		await store.publishItem(testId);
 		handleDeselect(testId);
 	}
 }
@@ -86,9 +87,9 @@ watch(
 			<ButtonSmall
 				v-if="itemsCount > 0"
 				color="primary"
-				text="Submit"
+				text="Publish"
 				:disabled="selected.size === 0"
-				@click="handleSubmit"
+				@click="handlePublish"
 			/>
 		</div>
 
@@ -159,7 +160,7 @@ watch(
 							<tbody
 								class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900"
 								v-for="(
-									{ title, description, status, jiraIssueId }, key
+									{ title, description, status, jiraTestId }, key
 								) in items"
 								:key="key"
 							>
@@ -169,7 +170,7 @@ watch(
 									:title="title"
 									:description="description"
 									:status="status"
-									:jiraIssueId="jiraIssueId"
+									:jiraTestId="jiraTestId"
 									:editing="beingEdited.has(key)"
 									:checked="selected.has(key)"
 									@start-edit="handleStartEdit"
