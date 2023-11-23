@@ -99,11 +99,7 @@ Expected Result
         if (status !== TEST_SCENARIO_STATUS.DRAFT) return false;
 
         this.setItemStatus(testId, TEST_SCENARIO_STATUS.PROCESSING);
-        const response = await api_createTestScenario(
-          storyId,
-          title,
-          description
-        );
+        const response = await api_createTestScenario(title, description);
 
         if (response.status && response.testScenarioId) {
           this.setItemStatus(testId, TEST_SCENARIO_STATUS.SUBMITTED);
