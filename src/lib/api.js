@@ -1,7 +1,7 @@
 const BASE_URL = "http://localhost:8080/apis";
 const ENDPOINTS = {
   GET_JIRA_ISSUE: "/jira/fetch/issue",
-  ADD_JOB: "/add-job",
+  ADD_JOB: "/add/issue",
   GET_JOB_STATUS: "/get-job-status",
   GET_JOB_OUTPUT: "/get-job-output",
   CREATE_JIRA_TEST: "/create-jira-test",
@@ -22,14 +22,22 @@ function url(path, params = {}) {
 
 export async function addJob(issueId) {
   try {
-    const response = await fetch(url(ENDPOINTS.ADD_JOB, { issueId }));
+    const response = await fetch(url(ENDPOINTS.ADD_JOB), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ issueId }),
+    });
+    // const response = await fetch(url(ENDPOINTS.ADD_JOB, { issueId }));
     if (!response.ok) {
       throw new Error("Network response was not ok");
     }
     const data = await response.json();
 
-    const issueId_response = data.key;
-    const { jobId = null, title, content } = data;
+    const jobId = data.uuid;
+    const issueId_response = data.issueId;
+    const { title, content } = data;
 
     return { jobId, issueId: issueId_response, title, content };
   } catch (error) {
