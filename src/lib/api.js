@@ -2,8 +2,8 @@ const BASE_URL = "http://localhost:8080/apis";
 const ENDPOINTS = {
 	GET_JIRA_ISSUE: "/jira/fetch/issue",
 	ADD_JOB: "/add/issue",
-	GET_JOB_STATUS: "/get-job-status",
-	GET_JOB_OUTPUT: "/get-job-output",
+	GET_JOB_STATUS: "/fetch/generation-job-status/{uuid}",
+	GET_JOB_OUTPUT: "/fetch/test-scenarios/{uuid}",
 	CREATE_JIRA_TEST: "/create-jira-test",
 };
 function url(path, params = {}) {
@@ -22,14 +22,7 @@ function url(path, params = {}) {
 
 export async function addJob(issueId) {
 	try {
-		const response = await fetch(url(ENDPOINTS.ADD_JOB), {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({ issueId }),
-		});
-		// const response = await fetch(url(ENDPOINTS.ADD_JOB, { issueId }));
+		const response = await fetch(url(ENDPOINTS.ADD_JOB, { issueId }));
 		if (!response.ok) {
 			throw new Error("Network response was not ok");
 		}
@@ -54,13 +47,16 @@ export async function addJob(issueId) {
 export async function getJobStatus(jobId, currentTime = 0) {
 	try {
 		const response = await fetch(
-			url(ENDPOINTS.GET_JOB_STATUS, { jobId, currentTime })
+			url(ENDPOINTS.GET_JOB_STATUS.replace("{uuid}", jobId), { currentTime })
 		);
 		if (!response.ok) {
 			throw new Error("Network response was not ok");
 		}
 
-		const data = await response.json();
+		const json = await response.json();
+		const { data = null } = json;
+		if (!data) throw new Error("Invalid response");
+
 		const { status = null, messages = [] } = data;
 
 		return { status, messages };
@@ -72,15 +68,20 @@ export async function getJobStatus(jobId, currentTime = 0) {
 
 export async function getJobOutput(jobId) {
 	try {
-		const response = await fetch(url(ENDPOINTS.GET_JOB_OUTPUT, { jobId }));
+		const response = await fetch(
+			url(ENDPOINTS.GET_JOB_OUTPUT.replace("{uuid}", jobId))
+		);
 		if (!response.ok) {
 			throw new Error("Network response was not ok");
 		}
 
-		const data = await response.json();
-		const { generatedTestCases = [] } = data;
+		const json = await response.json();
+		const { data = null } = json;
+		if (!data) throw new Error("Invalid response");
 
-		return { generatedTestCases };
+		const { generatedTests = [] } = data;
+
+		return { generatedTests };
 	} catch (error) {
 		console.error(error);
 		throw error;
