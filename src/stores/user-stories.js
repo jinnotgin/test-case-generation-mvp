@@ -77,11 +77,11 @@ export const useUserStoriesStore = defineStore("user-stories", {
 			// 	infoMessages: [],
 			// },
 		},
-		processingQueue: [],
+		processing: [],
 		maxQueueLength: 1, // configurable queue length
 	}),
 	actions: {
-		async startProcessing(listofIds = []) {
+		async fetchAndAddItems(listofIds = []) {
 			for (let storyId of listofIds) {
 				try {
 					const data = await api_addJob(storyId);
@@ -101,7 +101,7 @@ export const useUserStoriesStore = defineStore("user-stories", {
 				infoMessages: [],
 			};
 
-			this.shiftToProcessingQueue();
+			this.shiftToProcessing();
 		},
 		addInfoMessageToItem(itemId, type, title, content, dateStr = null) {
 			const dateObj = dateStr ? new Date(dateStr) : new Date();
@@ -112,7 +112,7 @@ export const useUserStoriesStore = defineStore("user-stories", {
 				date: toIsoStringWithTimezone(dateObj),
 			});
 		},
-		shiftToProcessingQueue() {
+		shiftToProcessing() {
 			// Filter out already processing stories
 			const processingStories = Object.keys(this.items).filter(
 				(key) => this.items[key].status === STORY_STATUS.PROCESSING
@@ -123,28 +123,28 @@ export const useUserStoriesStore = defineStore("user-stories", {
 			if (availableSlots <= 0) return false;
 
 			for (let [storyId, storyData] of Object.entries(this.items)) {
-				if (this.processingQueue.length >= this.maxQueueLength) break;
+				if (this.processing.length >= this.maxQueueLength) break;
 
 				const { status, jobId } = storyData;
 
 				if (status === STORY_STATUS.QUEUED) {
 					// Change the status to processing
 					this.items[storyId].status = STORY_STATUS.PROCESSING;
-					this.processingQueue.push({ storyId, jobId });
+					this.processing.push({ storyId, jobId });
 				}
 			}
 		},
-		removeFromProcessingQueue(targetStoryId) {
-			this.processingQueue = this.processingQueue.filter(
+		removeFromProcessing(targetStoryId) {
+			this.processing = this.processing.filter(
 				({ storyId }) => storyId !== targetStoryId
 			);
 		},
 		async checkQueuedStories() {
 			// TODO: Remove console.log in prod
 			console.log("Checking queued items...");
-			console.log(this.processingQueue);
+			console.log(this.processing);
 
-			for (let { storyId, jobId } of this.processingQueue) {
+			for (let { storyId, jobId } of this.processing) {
 				// TODO: for now, we will mock the test scenario data. remove in prod.
 				// this.getGeneratedTestScenarios_fake(storyId);
 
@@ -184,8 +184,8 @@ export const useUserStoriesStore = defineStore("user-stories", {
 					}
 
 					this.setItemStatus(storyId, STORY_STATUS.DONE);
-					this.removeFromProcessingQueue(storyId);
-					this.shiftToProcessingQueue();
+					this.removeFromProcessing(storyId);
+					this.shiftToProcessing();
 				}
 			}
 		},
@@ -211,10 +211,10 @@ export const useUserStoriesStore = defineStore("user-stories", {
 			// After processing, change the status (e.g., to 'done') and remove from the queue
 			console.log(userStoryId);
 			this.items[userStoryId].status = STORY_STATUS.DONE; // Assuming 'done' is a status
-			this.removeFromProcessingQueue(userStoryId);
+			this.removeFromProcessing(userStoryId);
 
 			// push other items for processing
-			this.shiftToProcessingQueue();
+			this.shiftToProcessing();
 		},
 	},
 });

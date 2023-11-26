@@ -95,7 +95,13 @@ export async function createJiraTest(storyId, title, content) {
 			title,
 			content,
 		};
-		const response = await fetch(url(ENDPOINTS.CREATE_JIRA_TEST), payload);
+		const response = await fetch(url(ENDPOINTS.CREATE_JIRA_TEST), {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(payload),
+		});
 		if (!response.ok) {
 			throw new Error("Network response was not ok");
 		}

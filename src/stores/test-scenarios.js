@@ -1,6 +1,8 @@
 import { defineStore } from "pinia";
 import { TEST_SCENARIO_STATUS } from "@/lib/constants.js";
-import { createJiraTest as api_createJiraTest } from "@/lib/api.js";
+import {
+	createJiraTest as api_createJiraTest,
+} from "@/lib/api.js";
 
 export const useTestScenariosStore = defineStore("test-scenarios", {
 	state: () => ({
@@ -43,7 +45,7 @@ Expected Result
 				jiraTestId: null,
 			},
 		},
-		syncingItems: new Set([]), // TODO: stub for future effort to sync CRUD with backend
+		syncing: new Set([]), // TODO: stub for future effort to sync CRUD with backend
 	}),
 	getters: {
 		getTestsByStoryId: (state) => {
@@ -60,6 +62,11 @@ Expected Result
 					{}
 				);
 				return relevantItems;
+			};
+		},
+		isSyncing: (state) => {
+			return (testId) => {
+				return state.syncing.has(testId);
 			};
 		},
 	},

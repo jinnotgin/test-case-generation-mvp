@@ -55,7 +55,7 @@ function handleCloseModal() {
 }
 function handleAddStories(data) {
 	console.log(data);
-	userStoriesStore.startProcessing(data);
+	userStoriesStore.fetchAndAddItems(data);
 }
 
 let intervalId = null;
@@ -72,7 +72,7 @@ onUnmounted(() => {
 });
 
 // TODO: Remove this from production (this is only for mock data)
-userStoriesStore.shiftToProcessingQueue();
+userStoriesStore.shiftToProcessing();
 </script>
 
 <template>
