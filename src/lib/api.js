@@ -93,7 +93,7 @@ export async function createJiraTest(storyId, title, content) {
 		const payload = {
 			issueId: storyId,
 			title,
-			content,
+			description: content,
 		};
 		const response = await fetch(url(ENDPOINTS.CREATE_JIRA_TEST), {
 			method: "POST",
