@@ -168,13 +168,13 @@ userStoriesStore.shiftToProcessingQueue();
 						<ul class="flex flex-col gap-3 px-3 overflow-auto list-none pb-4">
 							<li
 								v-for="(
-									{ type, title, description, date }, index
+									{ type, title, content, date }, index
 								) in currentUserStoryInfoMessages"
 							>
 								<AlertInline
 									:type="type"
 									:title="title"
-									:description="description"
+									:description="content"
 									:date="date"
 								/>
 							</li>

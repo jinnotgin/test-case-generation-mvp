@@ -6,7 +6,7 @@ import {
 	getJobOutput as api_getJobOutput,
 } from "@/lib/api.js";
 import { useTestScenariosStore } from "@/stores/test-scenarios.js";
-import { STORY_STATUS, API_JOB_STATUS } from "@/lib/constants.js";
+import { STORY_STATUS, API_JOB_STATUS, MESSAGE_TYPE } from "@/lib/constants.js";
 
 export const useUserStoriesStore = defineStore("user-stories", {
 	state: () => ({
@@ -103,12 +103,13 @@ export const useUserStoriesStore = defineStore("user-stories", {
 
 			this.shiftToProcessingQueue();
 		},
-		addInfoMessageToItem(itemId, type, title, description) {
+		addInfoMessageToItem(itemId, type, title, content, dateStr = null) {
+			const dateObj = dateStr ? new Date(dateStr) : new Date();
 			this.items[itemId].infoMessages.push({
 				type,
 				title,
-				description,
-				date: toIsoStringWithTimezone(new Date()),
+				content,
+				date: toIsoStringWithTimezone(dateObj),
 			});
 		},
 		shiftToProcessingQueue() {
@@ -152,24 +153,37 @@ export const useUserStoriesStore = defineStore("user-stories", {
 				const { status = null, messages } = data;
 
 				if (status === null || status === API_JOB_STATUS.STALLED) {
-					this.setItemStatus(STORY_STATUS.ERROR);
+					this.setItemStatus(storyId, STORY_STATUS.ERROR);
 					return false;
 				}
 
+				// TODO: not efficient but works for now until api upgraded to support getting message after a certain time
+				this.items[storyId].infoMessages = []; // clear out existing messages
+
 				for (let messageData of messages) {
-					const { type, title, description } = messageData;
-					this.addInfoMessageToItem(storyId, type, title, description);
+					const { type, title, content, createdTime, creator } = messageData;
+
+					this.addInfoMessageToItem(
+						storyId,
+						MESSAGE_TYPE[type],
+						title,
+						content,
+						createdTime
+					);
 				}
 
 				if (status === API_JOB_STATUS.COMPLETED) {
-					const data = api_getJobOutput(jobId);
+					const data = await api_getJobOutput(jobId);
 					const { generatedTests = [] } = data;
 
 					for (let testData of generatedTests) {
 						const { uuid, title, description } = testData;
-						testScenariosStore.addItem(uuid, title, description, userStoryId);
+
+						const testScenariosStore = useTestScenariosStore();
+						testScenariosStore.addItem(uuid, title, description, storyId);
 					}
 
+					this.setItemStatus(storyId, STORY_STATUS.DONE);
 					this.removeFromProcessingQueue(storyId);
 					this.shiftToProcessingQueue();
 				}

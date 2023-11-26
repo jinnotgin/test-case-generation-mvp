@@ -73,7 +73,9 @@ const titleClassString = computed(() => {
 					<span class="font-semibold" :class="titleClassString">{{
 						title
 					}}</span>
-					<p class="text-sm text-gray-600 dark:text-gray-200">
+					<p
+						class="text-sm text-gray-600 dark:text-gray-200 whitespace-pre-line"
+					>
 						{{ description }}
 					</p>
 				</div>

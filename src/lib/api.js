@@ -34,7 +34,7 @@ export async function addJob(issueId) {
 			jobId: data.uuid,
 			issueId: data.issueId,
 			title: data.title,
-			content: data.content,
+			content: data.description,
 		};
 
 		return output;
