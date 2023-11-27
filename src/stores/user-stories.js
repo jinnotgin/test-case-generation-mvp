@@ -138,6 +138,7 @@ export const useUserStoriesStore = defineStore("user-stories", {
 			this.processing = this.processing.filter(
 				({ storyId }) => storyId !== targetStoryId
 			);
+			this.shiftToProcessing();
 		},
 		async checkQueuedStories() {
 			// TODO: Remove console.log in prod
@@ -154,6 +155,7 @@ export const useUserStoriesStore = defineStore("user-stories", {
 
 				if (status === null || status === API_JOB_STATUS.STALLED) {
 					this.setItemStatus(storyId, STORY_STATUS.ERROR);
+					this.removeFromProcessing(storyId);
 					return false;
 				}
 
@@ -185,7 +187,6 @@ export const useUserStoriesStore = defineStore("user-stories", {
 
 					this.setItemStatus(storyId, STORY_STATUS.DONE);
 					this.removeFromProcessing(storyId);
-					this.shiftToProcessing();
 				}
 			}
 		},

@@ -4,6 +4,7 @@ const ENDPOINTS = {
 	ADD_JOB: "/add/issue",
 	GET_JOB_STATUS: "/fetch/generation-job-status/{uuid}",
 	GET_JOB_OUTPUT: "/fetch/test-scenarios/{uuid}",
+	UPDATE_TEST: "/update/test-scenarios/{uuid}",
 	CREATE_JIRA_TEST: "/create-jira-test",
 };
 function url(path, params = {}) {
@@ -110,6 +111,36 @@ export async function createJiraTest(storyId, title, content) {
 		const { status = null, testScenarioId = null } = data;
 
 		return { status, testScenarioId };
+	} catch (error) {
+		console.error(error);
+		throw error;
+	}
+}
+
+export async function updateTest(testId, title, description) {
+	try {
+		const payload = {
+			title,
+			description,
+		};
+		const response = await fetch(
+			url(ENDPOINTS.UPDATE_TEST.replace("{uuid}", testId)),
+			{
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(payload),
+			}
+		);
+		if (!response.ok) {
+			throw new Error("Network response was not ok");
+		}
+
+		const data = await response.json();
+		const { code } = data;
+
+		return code === "ok";
 	} catch (error) {
 		console.error(error);
 		throw error;

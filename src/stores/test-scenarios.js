@@ -1,49 +1,46 @@
 import { defineStore } from "pinia";
 import { TEST_SCENARIO_STATUS } from "@/lib/constants.js";
 import {
+	updateTest as api_updateTest,
 	createJiraTest as api_createJiraTest,
 } from "@/lib/api.js";
 
 export const useTestScenariosStore = defineStore("test-scenarios", {
 	state: () => ({
 		items: {
-			1700398085852: {
-				title: "Verify that the Game Story tab is displayed when clicked on",
-				description: `Pre-Conditions
-- User is logged in as a Teacher
-- User is viewing the course editor
-- User is viewing the gamification settings subpage
-
-Steps
-1. Click on the Game Story tab
-
-Expected Result
-- The Game Story tab is displayed
-- The subpage body shows the Game Story tab
-- Game Story details are shown
-`,
-				status: "published",
-				parentStoryId: "SLS-8040",
-				jiraTestId: "SLSTESTAI-0000",
-			},
-			1700398134835: {
-				title: "Verify that the Add Game Story button is displayed",
-				description: `Pre-Conditions
-- User is logged in as a Teacher
-- User is viewing the course editor
-- User is viewing the gamification settings subpage
-- User is viewing the Game Story tab
-
-Steps
-1. Verify that the Add Game Story button is displayed
-
-Expected Result
-- The Add Game Story button is displayed
-`,
-				status: "draft",
-				parentStoryId: "SLS-8040",
-				jiraTestId: null,
-			},
+			// 			1700398085852: {
+			// 				title: "Verify that the Game Story tab is displayed when clicked on",
+			// 				description: `Pre-Conditions
+			// - User is logged in as a Teacher
+			// - User is viewing the course editor
+			// - User is viewing the gamification settings subpage
+			// Steps
+			// 1. Click on the Game Story tab
+			// Expected Result
+			// - The Game Story tab is displayed
+			// - The subpage body shows the Game Story tab
+			// - Game Story details are shown
+			// `,
+			// 				status: "published",
+			// 				parentStoryId: "SLS-8040",
+			// 				jiraTestId: "SLSTESTAI-0000",
+			// 			},
+			// 			1700398134835: {
+			// 				title: "Verify that the Add Game Story button is displayed",
+			// 				description: `Pre-Conditions
+			// - User is logged in as a Teacher
+			// - User is viewing the course editor
+			// - User is viewing the gamification settings subpage
+			// - User is viewing the Game Story tab
+			// Steps
+			// 1. Verify that the Add Game Story button is displayed
+			// Expected Result
+			// - The Add Game Story button is displayed
+			// `,
+			// 				status: "draft",
+			// 				parentStoryId: "SLS-8040",
+			// 				jiraTestId: null,
+			// 			},
 		},
 		syncing: new Set([]), // TODO: stub for future effort to sync CRUD with backend
 	}),
@@ -95,6 +92,19 @@ Expected Result
 		},
 		setItemjiraTestId(testId, newValue) {
 			this.items[testId].jiraTestId = newValue;
+		},
+		async syncItemChanges(testId) {
+			try {
+				this.syncing.add(testId);
+				const { title, description } = this.items[testId];
+				const result = await api_updateTest(testId, title, description);
+				if (result) {
+					this.syncing.delete(testId);
+				}
+			} catch (error) {
+				console.error("Error syncing changes for", testId, error);
+				this.syncing.delete(testId);
+			}
 		},
 		async publishItem(testId) {
 			try {

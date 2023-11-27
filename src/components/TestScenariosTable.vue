@@ -43,8 +43,11 @@ const beingEdited = ref(new Set([]));
 function handleStartEdit(testId) {
 	beingEdited.value.add(testId);
 }
-function handleEndEdit(testId) {
-	beingEdited.value.delete(testId);
+async function handleEndEdit(testId) {
+	await store.syncItemChanges(testId);
+	// TODO: at this point, we are intentionally not checking if the above function is successful, as the API endpoint for this may not be ready yet for Demo day.
+
+	if (!store.isSyncing(testId)) beingEdited.value.delete(testId);
 }
 
 function handleDelete(testId) {
@@ -54,7 +57,7 @@ function handleDelete(testId) {
 
 async function handlePublish() {
 	for (let testId of selected.value) {
-		handleEndEdit(testId);
+		await handleEndEdit(testId);
 		await store.publishItem(testId);
 		handleDeselect(testId);
 	}
