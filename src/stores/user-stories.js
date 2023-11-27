@@ -11,67 +11,69 @@ import { STORY_STATUS, API_JOB_STATUS, MESSAGE_TYPE } from "@/lib/constants.js";
 export const useUserStoriesStore = defineStore("user-stories", {
 	state: () => ({
 		items: {
+			// success: SLS-8041, SLS-8140, SLS-7907, SLS-8453, SLS-7906
+			// interesting: SLS-8110
+			// failure: SLS-8040 (timeout)
+			// "SLS-8140": {
+			// 	jobId: "qn1w4eIBvMsjWXXLpWhMB",
+			// 	title:
+			// 		"As Teacher, given a Question with Speech Evaluation (SE) component in a Teacher Release Quiz, only allowed to mark my student's responses after the external Speech Evaluation engine has provided marks recommendations",
+			// 	content: "",
+			// 	status: STORY_STATUS.QUEUED,
+			// 	infoMessages: [],
+			// },
+			// "SLS-8041": {
+			// 	jobId: "-8tEwbII4FctBS-v8mIvX",
+			// 	title:
+			// 		"As a student, view gamification information for a gamified course (General page) (via Consumption)",
+			// 	content: "",
+			// 	status: STORY_STATUS.QUEUED,
+			// 	infoMessages: [],
+			// },
+			// "SLS-7907": {
+			// 	jobId: "GKsoSTAo3FleRNGRdvDIN",
+			// 	title:
+			// 		"As Teacher,  See the list of all Game Story in view mode and edit mode",
+			// 	content: "",
+			// 	status: STORY_STATUS.QUEUED,
+			// 	infoMessages: [],
+			// },
+			// "SLS-8453": {
+			// 	jobId: "vw4jVH0Ioe8NtcMNhL5K7",
+			// 	title:
+			// 		"As Teacher, add student assignees into an Activity Team (when creating a new team, or when editing an existing team)",
+			// 	content: "",
+			// 	status: STORY_STATUS.QUEUED,
+			// 	infoMessages: [],
+			// },
+			// "SLS-8110": {
+			// 	jobId: "XXUYtk8s4j2jjR1DwvF9U",
+			// 	title:
+			// 		"[UI Update] Visual indicator of Gamified Course Cards / Assignment Cards (now more prominent)",
+			// 	content: "",
+			// 	status: STORY_STATUS.QUEUED,
+			// 	infoMessages: [],
+			// },
 			// "SLS-8040": {
-			// 	jobId: "sample1",
+			// 	jobId: "YkP1Snu-chQUSyUHhARtk",
 			// 	title:
 			// 		"As a user, able to browse Gamified course from cards and table listing",
 			// 	content: "",
-			// 	status: STORY_STATUS.DONE,
-			// 	infoMessages: [
-			// 		{
-			// 			type: "warning",
-			// 			title: "Clarification (Jira User Stories)",
-			// 			description: "Generating questions to ask Jira User Stories...",
-			// 			date: "2023-11-19T22:30:49+08:00",
-			// 		},
-			// 		{
-			// 			type: "info",
-			// 			title:
-			// 				"Q: SLS-7874: What is the Game Story preview subpage? What is the purpose of this subpage? What elements are included on this subpage?",
-			// 			description:
-			// 				"A: The Game Story preview subpage is a subpage in the course editor where teachers can edit the settings for the game story. The settings include the title of the game story, the description, the image, and the conditions that must be met for the game story to be displayed to students.",
-			// 			date: "2023-11-19T22:31:47+08:00",
-			// 		},
-			// 		{
-			// 			type: "info",
-			// 			title: `Q: SLS-7905: What is the purpose of the "Move Up" and "Move Down" buttons?`,
-			// 			description: `A: The "Move Up" and "Move Down" buttons are used to reorder the activities in a lesson.`,
-			// 			date: "2023-11-19T22:31:54+08:00",
-			// 		},
-			// 		{
-			// 			type: "warning",
-			// 			title: "Clarification (MOE User Guide)",
-			// 			description: "Generating questions to ask MOE User Guide...",
-			// 			date: "2023-11-19T22:31:59+08:00",
-			// 		},
-			// 		{
-			// 			type: "info",
-			// 			title: `Q: What are the steps to create a new game story?`,
-			// 			description: `A: To create a new game story, you need to go to the Add Conditions subpage, click Add Conditions and select Game Story. From the left dropdown menu, choose a Game Story. Click Save to proceed.`,
-			// 			date: "2023-11-19T22:32:05+08:00",
-			// 		},
-			// 	],
+			// 	status: STORY_STATUS.QUEUED,
+			// 	infoMessages: [],
 			// },
-			// "SLS-8698": {
-			// 	jobId: "sample2",
+			// "SLS-8040": {
+			// 	jobId: "YkP1Snu-chQUSyUHhARtk",
 			// 	title:
-			// 		"As Teacher, toggle Game Team leaderboard functionality for assignees (ie students) (via Assignment Monitoring - Gamification)",
+			// 		"As a user, able to browse Gamified course from cards and table listing",
 			// 	content: "",
 			// 	status: STORY_STATUS.QUEUED,
 			// 	infoMessages: [],
 			// },
-			// "SLS-7723": {
-			// 	jobId: "sample3",
+			// "SLS-7906": {
+			// 	jobId: "JFeDBlnjkT79Z_iZZyRvp",
 			// 	title:
-			// 		"As Teacher, upon deletion of checkpoint, awarded checkpoints will be deleted in student consumption",
-			// 	content: "",
-			// 	status: STORY_STATUS.QUEUED,
-			// 	infoMessages: [],
-			// },
-			// "SLS-8788": {
-			// 	jobId: "sample4",
-			// 	title:
-			// 		"As Teacher, only add up to a maximum of 100 Game Teams per Assignment in an assigned Lesson / Course (Assignment) (Max Limit)",
+			// 		"As Teacher,  See the list of all achievement in view mode and edit mode",
 			// 	content: "",
 			// 	status: STORY_STATUS.QUEUED,
 			// 	infoMessages: [],
