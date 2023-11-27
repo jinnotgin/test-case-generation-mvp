@@ -23,7 +23,12 @@ function url(path, params = {}) {
 
 export async function addJob(issueId) {
 	try {
-		const response = await fetch(url(ENDPOINTS.ADD_JOB, { issueId }));
+		const response = await fetch(url(ENDPOINTS.ADD_JOB, { issueId }), {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+		});
 		if (!response.ok) {
 			throw new Error("Network response was not ok");
 		}
