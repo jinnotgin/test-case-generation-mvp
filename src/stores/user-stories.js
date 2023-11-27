@@ -101,6 +101,13 @@ export const useUserStoriesStore = defineStore("user-stories", {
 				infoMessages: [],
 			};
 
+			// if we are over-writing an existing user story, clear out any related test scenarios in the store
+			const testScenariosStore = useTestScenariosStore();
+			const existingTests = testScenariosStore.getTestsByStoryId(itemId);
+			for (let testId of Object.keys(existingTests)) {
+				testScenariosStore.deleteItem(testId);
+			}
+
 			this.shiftToProcessing();
 		},
 		addInfoMessageToItem(itemId, type, title, content, dateStr = null) {
