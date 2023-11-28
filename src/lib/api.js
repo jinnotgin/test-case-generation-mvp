@@ -6,6 +6,8 @@ const ENDPOINTS = {
 	GET_JOB_OUTPUT: "/fetch/test-scenarios/{uuid}",
 	UPDATE_TEST: "/update/test-scenarios/{uuid}",
 	CREATE_JIRA_TESTS_BULK: "/jira/create/issues",
+	ASK_USER_GUIDE: "/dialogflow/message",
+	ASK_SEARCH_JIRA_STORIES: "/discovery-engine/conversational-search",
 };
 function url(path, params = {}) {
 	const queryString = Object.keys(params).length
@@ -111,8 +113,9 @@ export async function updateTest(testId, title, description) {
 			throw new Error("Network response was not ok");
 		}
 
-		const data = await response.json();
-		const { code } = data;
+		const {
+			data: { code = "" },
+		} = await response.json();
 
 		return code === "ok";
 	} catch (error) {
@@ -137,11 +140,57 @@ export async function publishJiraTestsBulk(testIdsArray = []) {
 			throw new Error("Network response was not ok");
 		}
 
-		const json = await response.json();
-		const { data } = json;
-		const { testId = [] } = data;
+		const {
+			data: { testId = [] },
+		} = await response.json();
 
 		return testId;
+	} catch (error) {
+		console.error(error);
+		throw error;
+	}
+}
+
+export async function askUserGuide(message) {
+	try {
+		const response = await fetch(url(ENDPOINTS.ASK_USER_GUIDE), {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ message }),
+		});
+		if (!response.ok) {
+			throw new Error("Network response was not ok");
+		}
+
+		const { data = null } = await response.json();
+		if (!data) throw new Error("Network response was not ok");
+
+		return data;
+	} catch (error) {
+		console.error(error);
+		throw error;
+	}
+}
+
+export async function askSearchJiraStories(message) {
+	try {
+		const response = await fetch(url(ENDPOINTS.ASK_SEARCH_JIRA_STORIES), {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ message }),
+		});
+		if (!response.ok) {
+			throw new Error("Network response was not ok");
+		}
+
+		const { data = null } = await response.json();
+		if (!data) throw new Error("Network response was not ok");
+
+		return data;
 	} catch (error) {
 		console.error(error);
 		throw error;

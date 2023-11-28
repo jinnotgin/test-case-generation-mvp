@@ -1,8 +1,13 @@
 <script setup>
 import { ref } from "vue";
-import SearchAskBar from "@/components/SearchAskBar.vue";
+import AskSearchBar from "@/components/AskSearchBar.vue";
 import DropdownSelector from "@/components/DropdownSelector.vue";
 import SkeletonText from "@/components/SkeletonText.vue";
+import {
+	askUserGuide as api_askUserGuide,
+	askSearchJiraStories as api_askSearchJiraStories,
+} from "@/lib/api.js";
+import { stripHtml } from "@/lib/utils.js";
 // defineProps(["icon", "title", "description"]);
 
 const sources = {
@@ -12,20 +17,45 @@ const sources = {
 const activeSource = ref(Object.keys(sources)[0]);
 function handleSourceChange(newSourceName) {
 	activeSource.value = newSourceName;
+	reply.value = null;
+	searchResults.value = [];
 }
 
 const inProgress = ref(false);
-const answer = ref(null);
+const reply = ref(null);
 const searchResults = ref([]);
 
-function handleSearchAsk(searchAskQuery) {
-	inProgress.value = true;
+async function handleAskSearch(askSearchQuery) {
+	try {
+		inProgress.value = true;
 
-	console.log(searchAskQuery);
+		const response = {
+			reply: null,
+			searchResults: [],
+		};
+		switch (activeSource.value) {
+			case "moeUserGuide":
+				response.reply = await api_askUserGuide(askSearchQuery);
+				break;
+			case "jiraUserStories":
+				const { reply = null, searchResults = [] } =
+					await api_askSearchJiraStories(askSearchQuery);
 
-	setTimeout(() => {
+				response.reply = reply;
+				response.searchResults = searchResults;
+				break;
+			default:
+				console.error("Unknown activeSource", activeSource);
+		}
+		console.log({ response });
+		reply.value = response.reply;
+		searchResults.value = response.searchResults;
+
 		inProgress.value = false;
-	}, 1500);
+	} catch (error) {
+		console.error(error);
+		inProgress.value = false;
+	}
 }
 </script>
 
@@ -33,8 +63,8 @@ function handleSearchAsk(searchAskQuery) {
 	<div class="bg-slate-100 h-full">
 		<div class="flex flex-col mx-auto h-full">
 			<section class="bg-white mt-1 rounded-b-3xl">
-				<div class="container mx-auto py-6 flex items-center gap-2">
-					<SearchAskBar class="grow" @search-ask="handleSearchAsk" />
+				<div class="container ml-40 max-w-4xl py-10 flex items-center gap-2">
+					<AskSearchBar class="grow max-w-3xl" @ask-search="handleAskSearch" />
 					<DropdownSelector
 						:options="sources"
 						:selectedValue="activeSource"
@@ -42,15 +72,47 @@ function handleSearchAsk(searchAskQuery) {
 					/>
 				</div>
 			</section>
-			<section class="container mx-auto">
+
+			<section class="container ml-40 max-w-3xl">
 				<SkeletonText v-if="inProgress" class="py-6" />
-				<div v-else class=""></div>
+				<p v-else class="text-xl py-10 leading-relaxed text-gray-800">
+					{{ reply }}
+				</p>
 			</section>
+
 			<section
 				v-if="searchResults.length > 0"
-				class="h-20 bg-white mt-1 rounded-t-3xl"
+				class="bg-white py-10 rounded-t-3xl"
 			>
-				<div class="container mx-auto">Search Results</div>
+				<ul class="container ml-40 max-w-3xl flex flex-col gap-10">
+					<li
+						v-for="(result, index) in searchResults"
+						:key="result.link"
+						class=""
+					>
+						<div class="flex gap-2 items-center">
+							<span class="text-sm text-gray-500 font-medium"
+								>[{{ index + 1 }}]</span
+							>
+							<a
+								:href="result.link"
+								target="_blank"
+								class="text-xs text-gray-500"
+								>{{ result.link }}</a
+							>
+						</div>
+						<a
+							class="mt-1 text-gray-800 text-xl font-medium line-clamp-1 hover:underline"
+							:href="result.link"
+							target="_blank"
+						>
+							{{ result.title }}
+						</a>
+						<p class="mt-1 text-sm text-gray-800 line-clamp-1">
+							{{ stripHtml(result.snippet) }}
+						</p>
+					</li>
+				</ul>
 			</section>
 		</div>
 	</div>

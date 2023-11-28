@@ -7,9 +7,9 @@ import { RouterLink, RouterView } from "vue-router";
 		<img alt="Logo" class="logo mx-2" src="@/assets/logo.svg" width="42" />
 		<span class="font-bold font-mono logo-text text-md">TestForge AI</span>
 
-		<div class="mx-4 h-full border border-slate-300"></div>
+		<div class="mx-5 h-full border border-slate-300"></div>
 
-		<nav class="flex gap-4">
+		<nav class="flex gap-5">
 			<RouterLink to="/">Home</RouterLink>
 			<RouterLink to="/chat">Chat</RouterLink>
 		</nav>

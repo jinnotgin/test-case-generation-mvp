@@ -39,3 +39,8 @@ export function formatDate(date) {
 
 	return `${year}-${month}-${day} ${formattedHours}:${minutes} ${ampm}`;
 }
+
+export function stripHtml(html) {
+	let doc = new DOMParser().parseFromString(html, "text/html");
+	return doc.body.textContent || "";
+}
