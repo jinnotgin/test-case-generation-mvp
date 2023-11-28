@@ -27,7 +27,10 @@ const searchResults = ref([]);
 
 async function handleAskSearch(askSearchQuery) {
 	try {
+		if (askSearchQuery.trim() === "") return false;
+
 		inProgress.value = true;
+		searchResults.value = [];
 
 		const response = {
 			reply: null,
@@ -60,10 +63,10 @@ async function handleAskSearch(askSearchQuery) {
 </script>
 
 <template>
-	<div class="bg-slate-100 h-full">
+	<div class="bg-slate-100 h-full overflow-x-hidden">
 		<div class="flex flex-col mx-auto h-full">
 			<section class="bg-white mt-1 rounded-b-3xl">
-				<div class="container ml-40 max-w-4xl py-10 flex items-center gap-2">
+				<div class="container ml-40 py-10 flex items-center gap-2">
 					<AskSearchBar class="grow max-w-3xl" @ask-search="handleAskSearch" />
 					<DropdownSelector
 						:options="sources"
@@ -82,7 +85,7 @@ async function handleAskSearch(askSearchQuery) {
 
 			<section
 				v-if="searchResults.length > 0"
-				class="bg-white py-10 rounded-t-3xl"
+				class="bg-white pt-12 pb-24 rounded-t-3xl"
 			>
 				<ul class="container ml-40 max-w-3xl flex flex-col gap-10">
 					<li
@@ -105,6 +108,7 @@ async function handleAskSearch(askSearchQuery) {
 							class="mt-1 text-gray-800 text-xl font-medium line-clamp-1 hover:underline"
 							:href="result.link"
 							target="_blank"
+							:title="result.title"
 						>
 							{{ result.title }}
 						</a>
