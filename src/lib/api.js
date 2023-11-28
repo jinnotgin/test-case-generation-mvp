@@ -113,11 +113,9 @@ export async function updateTest(testId, title, description) {
 			throw new Error("Network response was not ok");
 		}
 
-		const {
-			data: { code = "" },
-		} = await response.json();
+		const { code, data } = await response.json();
 
-		return code === "ok";
+		return code === "ok" && data == "1";
 	} catch (error) {
 		console.error(error);
 		throw error;

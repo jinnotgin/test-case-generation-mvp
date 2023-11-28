@@ -42,7 +42,7 @@ export const useTestScenariosStore = defineStore("test-scenarios", {
 			// 				issueId: null,
 			// 			},
 		},
-		syncing: new Set([]), // TODO: stub for future effort to sync CRUD with backend
+		syncing: new Set([]),
 	}),
 	getters: {
 		getTestsByStoryId: (state) => {
