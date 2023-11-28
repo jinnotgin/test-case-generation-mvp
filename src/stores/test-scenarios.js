@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { TEST_SCENARIO_STATUS } from "@/lib/constants.js";
 import {
 	updateTest as api_updateTest,
-	createJiraTest as api_createJiraTest,
+	publishJiraTestsBulk as api_publishJiraTestsBulk,
 } from "@/lib/api.js";
 
 export const useTestScenariosStore = defineStore("test-scenarios", {
@@ -23,7 +23,7 @@ export const useTestScenariosStore = defineStore("test-scenarios", {
 			// `,
 			// 				status: "published",
 			// 				parentStoryId: "SLS-8040",
-			// 				jiraTestId: "SLSTESTAI-0000",
+			// 				issueId: "SLSTESTAI-0000",
 			// 			},
 			// 			1700398134835: {
 			// 				title: "Verify that the Add Game Story button is displayed",
@@ -39,7 +39,7 @@ export const useTestScenariosStore = defineStore("test-scenarios", {
 			// `,
 			// 				status: "draft",
 			// 				parentStoryId: "SLS-8040",
-			// 				jiraTestId: null,
+			// 				issueId: null,
 			// 			},
 		},
 		syncing: new Set([]), // TODO: stub for future effort to sync CRUD with backend
@@ -75,7 +75,7 @@ export const useTestScenariosStore = defineStore("test-scenarios", {
 				description,
 				status: TEST_SCENARIO_STATUS.DRAFT,
 				parentStoryId: storyId,
-				jiraTestId: null,
+				issueId: null,
 			};
 		},
 		deleteItem(testId) {
@@ -90,8 +90,8 @@ export const useTestScenariosStore = defineStore("test-scenarios", {
 		setItemStatus(testId, newValue) {
 			this.items[testId].status = newValue;
 		},
-		setItemjiraTestId(testId, newValue) {
-			this.items[testId].jiraTestId = newValue;
+		setItemIssueId(testId, newValue) {
+			this.items[testId].issueId = newValue;
 		},
 		async syncItemChanges(testId) {
 			try {
@@ -106,25 +106,34 @@ export const useTestScenariosStore = defineStore("test-scenarios", {
 				this.syncing.delete(testId);
 			}
 		},
-		async publishItem(testId) {
+		async publishItems(_testIdsArray) {
+			// only consider tests that are still in draft state
+			const testIdsArray = _testIdsArray.filter((testId) => {
+				return this.items[testId].status === TEST_SCENARIO_STATUS.DRAFT;
+			});
+			if (testIdsArray.length === 0) return false;
+
 			try {
-				const testData = this.items[testId];
-				const { title, description, status } = testData;
-
-				if (status !== TEST_SCENARIO_STATUS.DRAFT) return false;
-
-				this.setItemStatus(testId, TEST_SCENARIO_STATUS.PROCESSING);
-				const response = await api_createJiraTest(title, description);
-
-				if (response.status && response.testScenarioId) {
-					this.setItemStatus(testId, TEST_SCENARIO_STATUS.PUBLISHED);
-					this.setItemjiraTestId(testId, response.testScenarioId);
-				} else {
-					this.setItemStatus(testId, TEST_SCENARIO_STATUS.DRAFT);
+				for (let testId of testIdsArray) {
+					this.setItemStatus(testId, TEST_SCENARIO_STATUS.PROCESSING);
 				}
+
+				const issueIdsArray = await api_publishJiraTestsBulk(testIdsArray);
+				if (issueIdsArray.length !== testIdsArray.length) {
+					throw new Error("Publishing Tests to Jira was not ok");
+				}
+
+				issueIdsArray.forEach((issueId, index) => {
+					const testId = testIdsArray[index];
+
+					this.setItemStatus(testId, TEST_SCENARIO_STATUS.PUBLISHED);
+					this.setItemIssueId(testId, issueId);
+				});
 			} catch (error) {
-				this.setItemStatus(testId, TEST_SCENARIO_STATUS.DRAFT);
-				console.error("Error creating test scenario", testId, error);
+				testIdsArray.forEach((testId) => {
+					this.setItemStatus(testId, TEST_SCENARIO_STATUS.DRAFT);
+				});
+				console.error("Error creating test scenario", testIdsArray, error);
 			}
 		},
 	},

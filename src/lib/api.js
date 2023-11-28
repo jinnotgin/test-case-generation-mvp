@@ -5,7 +5,7 @@ const ENDPOINTS = {
 	GET_JOB_STATUS: "/fetch/generation-job-status/{uuid}",
 	GET_JOB_OUTPUT: "/fetch/test-scenarios/{uuid}",
 	UPDATE_TEST: "/update/test-scenarios/{uuid}",
-	CREATE_JIRA_TEST: "/create-jira-test",
+	CREATE_JIRA_TESTS_BULK: "/jira/create/issues",
 };
 function url(path, params = {}) {
 	const queryString = Object.keys(params).length
@@ -25,9 +25,6 @@ export async function addJob(issueId) {
 	try {
 		const response = await fetch(url(ENDPOINTS.ADD_JOB, { issueId }), {
 			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
 		});
 		if (!response.ok) {
 			throw new Error("Network response was not ok");
@@ -94,34 +91,6 @@ export async function getJobOutput(jobId) {
 	}
 }
 
-export async function createJiraTest(storyId, title, content) {
-	try {
-		const payload = {
-			issueId: storyId,
-			title,
-			description: content,
-		};
-		const response = await fetch(url(ENDPOINTS.CREATE_JIRA_TEST), {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify(payload),
-		});
-		if (!response.ok) {
-			throw new Error("Network response was not ok");
-		}
-
-		const data = await response.json();
-		const { status = null, testScenarioId = null } = data;
-
-		return { status, testScenarioId };
-	} catch (error) {
-		console.error(error);
-		throw error;
-	}
-}
-
 export async function updateTest(testId, title, description) {
 	try {
 		const payload = {
@@ -146,6 +115,33 @@ export async function updateTest(testId, title, description) {
 		const { code } = data;
 
 		return code === "ok";
+	} catch (error) {
+		console.error(error);
+		throw error;
+	}
+}
+
+export async function publishJiraTestsBulk(testIdsArray = []) {
+	try {
+		const payload = {
+			testScenarioUuids: testIdsArray,
+		};
+		const response = await fetch(url(ENDPOINTS.CREATE_JIRA_TESTS_BULK), {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(payload),
+		});
+		if (!response.ok) {
+			throw new Error("Network response was not ok");
+		}
+
+		const json = await response.json();
+		const { data } = json;
+		const { testId = [] } = data;
+
+		return testId;
 	} catch (error) {
 		console.error(error);
 		throw error;

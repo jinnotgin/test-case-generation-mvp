@@ -9,7 +9,7 @@ const props = defineProps({
 	title: String,
 	description: String,
 	status: String,
-	jiraTestId: String,
+	issueId: String,
 	editing: Boolean,
 	checked: Boolean,
 });
@@ -23,8 +23,7 @@ const titleValue = computed({
 });
 const descriptionValue = computed({
 	get: () => testCaseData.description,
-	set: (value) =>
-		store.setItemDescription(props.testId, value),
+	set: (value) => store.setItemDescription(props.testId, value),
 });
 
 const emit = defineEmits([
@@ -51,7 +50,7 @@ function handleDelete() {
 }
 
 const currentJiraIssueUrl = computed(() => {
-	return JIRA_ISSUE_URL.replace("{0}", props.jiraTestId);
+	return JIRA_ISSUE_URL.replace("{0}", props.issueId);
 });
 </script>
 
@@ -98,9 +97,7 @@ const currentJiraIssueUrl = computed(() => {
 				<p v-else>{{ description }}</p>
 			</div>
 		</td>
-		<td
-			class="px-12 py-3 text-sm text-gray-700 whitespace-nowrap"
-		>
+		<td class="px-12 py-3 text-sm text-gray-700 whitespace-nowrap">
 			<div
 				v-if="status === TEST_SCENARIO_STATUS.DRAFT"
 				class="inline-flex items-center px-3 py-1 rounded-full gap-x-2 bg-blue-100/60 dark:bg-gray-800"
@@ -127,7 +124,10 @@ const currentJiraIssueUrl = computed(() => {
 			</div>
 		</td>
 		<td class="px-4 py-4 whitespace-nowrap">
-			<div v-if="status !== TEST_SCENARIO_STATUS.PUBLISHED" class="flex items-center justify-end gap-x-6">
+			<div
+				v-if="status !== TEST_SCENARIO_STATUS.PUBLISHED"
+				class="flex items-center justify-end gap-x-6"
+			>
 				<button
 					class="text-gray-500 transition-colors duration-200 dark:hover:text-red-500 dark:text-gray-300 hover:text-red-500 focus:outline-none"
 					@click="handleDelete"
@@ -150,12 +150,9 @@ const currentJiraIssueUrl = computed(() => {
 					<vue-feather type="check" size="20" class="w-5 h-5" />
 				</button>
 			</div>
-			<a
-				v-else
-				class="text-xs align-top"
-				:href="currentJiraIssueUrl"
-				>{{ jiraTestId }}</a
-			>
+			<a v-else class="text-xs align-top" :href="currentJiraIssueUrl">{{
+				issueId
+			}}</a>
 		</td>
 	</tr>
 </template>

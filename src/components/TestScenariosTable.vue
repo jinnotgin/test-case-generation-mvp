@@ -58,7 +58,9 @@ function handleDelete(testId) {
 async function handlePublish() {
 	for (let testId of selected.value) {
 		await handleEndEdit(testId);
-		await store.publishItem(testId);
+	}
+	await store.publishItems(Array.from(selected.value));
+	for (let testId of selected.value) {
 		handleDeselect(testId);
 	}
 }
@@ -162,9 +164,7 @@ watch(
 
 							<tbody
 								class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900"
-								v-for="(
-									{ title, description, status, jiraTestId }, key
-								) in items"
+								v-for="({ title, description, status, issueId }, key) in items"
 								:key="key"
 							>
 								<Row
@@ -173,7 +173,7 @@ watch(
 									:title="title"
 									:description="description"
 									:status="status"
-									:jiraTestId="jiraTestId"
+									:issueId="issueId"
 									:editing="beingEdited.has(key)"
 									:checked="selected.has(key)"
 									@start-edit="handleStartEdit"
