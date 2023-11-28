@@ -58,16 +58,31 @@ function handleAddStories(data) {
 	userStoriesStore.fetchAndAddItems(data);
 }
 
-let intervalId = null;
-const startPolling = () => {
-	intervalId = setInterval(() => {
-		userStoriesStore.checkQueuedStories();
-	}, 5000); // Poll every 5 seconds
+let timeoutId = null;
+const startPolling = async () => {
+	const POLL_INTERVAL = 5 * 1000;
+
+	const pollFunction = async () => {
+		try {
+			if (userStoriesStore.processing.length > 0) {
+				await userStoriesStore.checkQueuedStories();
+			}
+			// Schedule the next call after a delay if the function completes successfully
+			timeoutId = setTimeout(pollFunction, POLL_INTERVAL); // Poll every 5 seconds
+		} catch (error) {
+			console.error("An error occurred during polling:", error);
+			// Optionally, retry polling after a delay in case of an error
+			timeoutId = setTimeout(pollFunction, POLL_INTERVAL);
+		}
+	};
+
+	pollFunction(); // Start the polling
 };
+
 onMounted(startPolling);
 onUnmounted(() => {
-	if (intervalId) {
-		clearInterval(intervalId);
+	if (timeoutId) {
+		clearTimeout(timeoutId);
 	}
 });
 

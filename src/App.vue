@@ -5,7 +5,9 @@ import { RouterLink, RouterView } from "vue-router";
 <template>
 	<header class="flex p-2 items-center" style="height: 48px">
 		<img alt="Logo" class="logo mx-2" src="@/assets/logo.svg" width="42" />
-		<span class="font-bold font-mono logo-text text-md">TestForge AI</span>
+		<span class="font-bold font-mono logo-text text-md select-none"
+			>TestForge AI</span
+		>
 
 		<div class="mx-5 h-full border border-slate-300"></div>
 
@@ -15,9 +17,9 @@ import { RouterLink, RouterView } from "vue-router";
 		</nav>
 	</header>
 
-	<div style="height: calc(100svh - 48px)">
+	<main style="height: calc(100svh - 48px)">
 		<RouterView />
-	</div>
+	</main>
 </template>
 
 <style scoped>

@@ -95,6 +95,9 @@ export const useUserStoriesStore = defineStore("user-stories", {
 			}
 		},
 		addItem(itemId, jobId, title, content) {
+			// if we are overwriting an existing user story, clear it from processing
+			this.removeFromProcessing(itemId);
+
 			this.items[itemId] = {
 				jobId,
 				title,

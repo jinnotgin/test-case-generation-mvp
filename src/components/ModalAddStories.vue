@@ -31,23 +31,26 @@ function handleSubmit() {
 	const inputString = textInputValue.value;
 
 	const regex = /SLS-\d+/g;
-	let matches = inputString.match(regex);
+	let matches = inputString.toUpperCase().match(regex);
 	if (matches === null) matches = [];
 
-	console.log("Found instances:", matches);
-	emit("add-stories", matches);
+	const uniqueMatches = [...new Set(matches)];
+
+	console.log("Found instances:", uniqueMatches);
+	emit("add-stories", uniqueMatches);
 	emit("close-modal");
 	textInputValue.value = "";
 }
+
+// not sure why this height was previously used h-[calc(100%-1rem)]
 </script>
 
 <template>
 	<div
-		id="authentication-modal"
 		tabindex="-1"
 		aria-hidden="true"
 		:class="modalClassString"
-		class="overflow-y-auto overflow-x-hidden fixed inset-0 bg-gray-500 bg-opacity-75 z-50 flex justify-center items-center w-full h-[calc(100%-1rem)] max-h-full"
+		class="overflow-y-auto overflow-x-hidden fixed inset-0 bg-gray-500 bg-opacity-75 z-50 flex justify-center items-center w-full h-full max-h-full"
 	>
 		<div class="relative p-4 w-full max-w-md max-h-full">
 			<!-- Modal content -->

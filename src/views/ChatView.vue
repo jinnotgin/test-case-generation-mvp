@@ -25,12 +25,24 @@ const inProgress = ref(false);
 const reply = ref(null);
 const searchResults = ref([]);
 
+const previousAskSearch = {
+	askSearchQuery: null,
+	activeSource: null,
+};
 async function handleAskSearch(askSearchQuery) {
 	try {
 		if (askSearchQuery.trim() === "") return false;
+		if (
+			previousAskSearch.askSearchQuery === askSearchQuery &&
+			previousAskSearch.activeSource === activeSource.value
+		) {
+			return false;
+		}
 
 		inProgress.value = true;
 		searchResults.value = [];
+		previousAskSearch.askSearchQuery = askSearchQuery;
+		previousAskSearch.activeSource = activeSource.value;
 
 		const response = {
 			reply: null,
@@ -50,7 +62,6 @@ async function handleAskSearch(askSearchQuery) {
 			default:
 				console.error("Unknown activeSource", activeSource);
 		}
-		console.log({ response });
 		reply.value = response.reply;
 		searchResults.value = response.searchResults;
 
@@ -66,7 +77,7 @@ async function handleAskSearch(askSearchQuery) {
 	<div class="bg-slate-100 h-full overflow-x-hidden">
 		<div class="flex flex-col mx-auto h-full">
 			<section class="bg-white mt-1 rounded-b-3xl">
-				<div class="container ml-40 py-10 flex items-center gap-2">
+				<div class="container ml-40 py-10 flex items-center gap-4">
 					<AskSearchBar class="grow max-w-3xl" @ask-search="handleAskSearch" />
 					<DropdownSelector
 						:options="sources"
@@ -77,7 +88,7 @@ async function handleAskSearch(askSearchQuery) {
 			</section>
 
 			<section class="container ml-40 max-w-3xl">
-				<SkeletonText v-if="inProgress" class="py-6" />
+				<SkeletonText v-if="inProgress" class="py-10" />
 				<p v-else class="text-xl py-10 leading-relaxed text-gray-800">
 					{{ reply }}
 				</p>
@@ -105,7 +116,7 @@ async function handleAskSearch(askSearchQuery) {
 							>
 						</div>
 						<a
-							class="mt-1 text-gray-800 text-xl font-medium line-clamp-1 hover:underline"
+							class="mt-1 text-gray-800 text-xl font-medium line-clamp-2 hover:underline"
 							:href="result.link"
 							target="_blank"
 							:title="result.title"

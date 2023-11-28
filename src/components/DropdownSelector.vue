@@ -40,7 +40,7 @@ onUnmounted(() => {
 	<div class="relative" ref="dropdownRef">
 		<button
 			@click="toggleDropdown"
-			class="bg-blue-600 text-white pl-4 pr-2 py-2 rounded flex"
+			class="bg-blue-600 text-white pl-4 pr-2 py-2 rounded-lg flex"
 		>
 			{{
 				props.selectedValue ? props.options[props.selectedValue] : "Dropdown"
