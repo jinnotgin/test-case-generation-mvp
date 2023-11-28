@@ -2,6 +2,7 @@
 import VueFeather from "vue-feather";
 defineProps(["icon", "title", "description"]);
 </script>
+
 <template>
 	<div
 		class="flex items-center text-center border rounded-lg h-full dark:border-gray-700 overflow-hidden"
