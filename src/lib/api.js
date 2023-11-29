@@ -62,7 +62,11 @@ export async function getJobStatus(jobId, currentTime = 0) {
 		const { data = null } = json;
 		if (!data) throw new Error("Invalid response");
 
-		const { status = null, lastAction = null, messages = [] } = data;
+		const {
+			status = null,
+			lastAction = null,
+			recentLogs: messages = [],
+		} = data;
 
 		return { status, lastAction, messages };
 	} catch (error) {
