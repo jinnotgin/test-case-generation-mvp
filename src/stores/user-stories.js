@@ -131,8 +131,7 @@ export const useUserStoriesStore = defineStore("user-stories", {
 				}
 
 				if (status === API_JOB_STATUS.SUCCESS) {
-					const data = await api_getJobOutput(jobId);
-					const { generatedTests = [] } = data;
+					const generatedTests = await api_getJobOutput(jobId);
 
 					for (let testData of generatedTests) {
 						const { uuid, title, description } = testData;

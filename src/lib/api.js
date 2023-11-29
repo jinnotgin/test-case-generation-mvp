@@ -81,12 +81,9 @@ export async function getJobOutput(jobId) {
 		}
 
 		const json = await response.json();
-		const { data = null } = json;
+		const { data = [] } = json;
 		if (!data) throw new Error("Invalid response");
-
-		const { generatedTests = [] } = data;
-
-		return { generatedTests };
+		return data;
 	} catch (error) {
 		console.error(error);
 		throw error;
