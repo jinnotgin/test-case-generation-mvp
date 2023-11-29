@@ -10,8 +10,8 @@ import ButtonSmall from "@/components/ButtonSmall.vue";
 import ModalAddStories from "@/components/ModalAddStories.vue";
 import EmptyPlaceholder from "@/components/EmptyPlaceholder.vue";
 import LastActionLabel from "@/components/LastActionLabel.vue";
-import { JIRA_ISSUE_URL } from "@/lib/constants.js";
-import { scrollToBottomIfNeeded } from "@/lib/utils.js";
+import { JIRA_ISSUE_URL, STORY_STATUS } from "@/lib/constants.js";
+import { scrollElementToBottom } from "@/lib/utils.js";
 
 import { useUserStoriesStore } from "@/stores/user-stories";
 import { useTestScenariosStore } from "@/stores/test-scenarios";
@@ -20,6 +20,7 @@ const userStoriesStore = useUserStoriesStore();
 const testScenariosStore = useTestScenariosStore();
 
 const infoMessagesDom = ref(null);
+const isMouseInInfoMessagesDom = ref(false);
 
 const userStoriesCount = computed(() => {
 	return userStoriesStore && userStoriesStore.items
@@ -68,7 +69,12 @@ const startPolling = async () => {
 			if (userStoriesStore.processing.length > 0) {
 				await userStoriesStore.checkQueuedStories();
 				await nextTick();
-				scrollToBottomIfNeeded(infoMessagesDom.value);
+				if (
+					currentUserStoryData.value.status === STORY_STATUS.PROCESSING &&
+					!isMouseInInfoMessagesDom.value
+				) {
+					scrollElementToBottom(infoMessagesDom.value);
+				}
 			}
 			// Schedule the next call after a delay if the function completes successfully
 			timeoutId = setTimeout(pollFunction, POLL_INTERVAL); // Poll every 5 seconds
@@ -94,7 +100,10 @@ watch(
 	() => currentUserStoryId.value,
 	async (newValue, oldValue) => {
 		await nextTick();
-		scrollToBottomIfNeeded(infoMessagesDom.value, true);
+		if (!isMouseInInfoMessagesDom.value) {
+			// only auto scroll to bottom if mouse is outside info messages
+			scrollElementToBottom(infoMessagesDom.value);
+		}
 	}
 );
 
@@ -159,7 +168,7 @@ userStoriesStore.shiftToProcessing();
 					description=""
 				/>
 				<splitpanes v-else horizontal>
-					<pane size="65" class="flex flex-col pb-4 h-full">
+					<pane size="75" class="flex flex-col pb-4 h-full">
 						<div class="w-ful bg-slate-200 mb-4">
 							<div
 								class="container flex items-center justify-between px-4 py-4 mx-auto"
@@ -179,7 +188,7 @@ userStoriesStore.shiftToProcessing();
 						</div>
 						<TestScenariosTable :userStoryId="currentUserStoryId"
 					/></pane>
-					<pane size="35" class="flex flex-col gap-2"
+					<pane size="25" class="flex flex-col gap-2"
 						><div
 							class="bg-gray-600 text-white px-3 py-2 flex justify-between items-center text-sm"
 						>
@@ -198,7 +207,12 @@ userStoriesStore.shiftToProcessing();
 							title="Nothing to see here"
 							description=""
 						/>
-						<ul class="flex flex-col gap-3 px-3 overflow-auto list-none pb-4" ref="infoMessagesDom">
+						<ul
+							class="flex flex-col gap-3 px-3 overflow-auto list-none pb-4"
+							ref="infoMessagesDom"
+							@mouseenter="isMouseInInfoMessagesDom = true"
+							@mouseleave="isMouseInInfoMessagesDom = false"
+						>
 							<li
 								v-for="(
 									{ type, title, content, date }, index
