@@ -57,7 +57,7 @@ function handleDelete(testId) {
 
 async function handlePublish() {
 	for (let testId of selected.value) {
-		await handleEndEdit(testId);
+		if (beingEdited.value.has(testId)) await handleEndEdit(testId);
 	}
 	await store.publishItems(Array.from(selected.value));
 	for (let testId of selected.value) {
