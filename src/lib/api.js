@@ -115,7 +115,7 @@ export async function updateTest(testId, title, description) {
 
 		const { code, data } = await response.json();
 
-		return code === "ok" && data == "1";
+		return code === "ok";
 	} catch (error) {
 		console.error(error);
 		throw error;

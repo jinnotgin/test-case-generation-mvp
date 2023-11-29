@@ -165,7 +165,7 @@ export const useUserStoriesStore = defineStore("user-stories", {
 				const data = await api_getJobStatus(jobId, currentTime);
 				const { status = null, messages } = data;
 
-				if (status === null || status === API_JOB_STATUS.STALLED) {
+				if (status === null || status === API_JOB_STATUS.ERROR) {
 					this.setItemStatus(storyId, STORY_STATUS.ERROR);
 					this.removeFromProcessing(storyId);
 					return false;
@@ -186,7 +186,7 @@ export const useUserStoriesStore = defineStore("user-stories", {
 					);
 				}
 
-				if (status === API_JOB_STATUS.COMPLETED) {
+				if (status === API_JOB_STATUS.SUCCESS) {
 					const data = await api_getJobOutput(jobId);
 					const { generatedTests = [] } = data;
 
