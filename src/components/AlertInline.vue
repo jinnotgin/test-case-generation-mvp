@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from "vue";
-import { formatDate } from "@/lib/utils.js";
+import { formatDateString } from "@/lib/utils.js";
 const props = defineProps(["type", "title", "description", "date"]);
 
 const iconClassString = computed(() => {
@@ -81,7 +81,7 @@ const titleClassString = computed(() => {
 				</div>
 				<div class="w-30 flex-shrink-0">
 					<span class="font-light italic text-xs">{{
-						formatDate(new Date(date))
+						formatDateString(date)
 					}}</span>
 				</div>
 			</div>

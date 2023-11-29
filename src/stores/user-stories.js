@@ -19,6 +19,7 @@ export const useUserStoriesStore = defineStore("user-stories", {
 			// success: SLS-8041, SLS-8140, SLS-7907, SLS-8453, SLS-7906
 			// interesting: SLS-8110
 			// failure: SLS-8040 (timeout)
+			// interesting (making something from nothing): SLS-5423
 		},
 		processing: [],
 		maxQueueLength: 1, // configurable queue length
@@ -57,13 +58,12 @@ export const useUserStoriesStore = defineStore("user-stories", {
 
 			this.shiftToProcessing();
 		},
-		addInfoMessageToItem(itemId, type, title, content, dateStr = null) {
-			const dateObj = dateStr ? new Date(dateStr) : new Date();
+		addInfoMessageToItem(itemId, type, title, content, date = null) {
 			this.items[itemId].infoMessages.push({
 				type,
 				title,
 				content,
-				date: toIsoStringWithTimezone(dateObj),
+				date,
 			});
 		},
 		shiftToProcessing() {
@@ -119,14 +119,14 @@ export const useUserStoriesStore = defineStore("user-stories", {
 				this.items[storyId].infoMessages = []; // clear out existing messages
 
 				for (let messageData of messages) {
-					const { type, title, content, createdTime, creator } = messageData;
+					const { type, title, description, time, creator } = messageData;
 
 					this.addInfoMessageToItem(
 						storyId,
 						MESSAGE_TYPE[type],
 						title,
-						content,
-						createdTime
+						description,
+						time
 					);
 				}
 

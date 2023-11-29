@@ -25,7 +25,7 @@ export function toIsoStringWithTimezone(date) {
 	);
 }
 
-export function formatDate(date) {
+export function formatDateAsDisplayString(date) {
 	const year = date.getFullYear();
 	const month = (date.getMonth() + 1).toString().padStart(2, "0");
 	const day = date.getDate().toString().padStart(2, "0");
@@ -38,6 +38,14 @@ export function formatDate(date) {
 	const formattedHours = hours.toString().padStart(1, "0");
 
 	return `${year}-${month}-${day} ${formattedHours}:${minutes} ${ampm}`;
+}
+
+export function formatDateString(dateStr) {
+	const dateObj = new Date(dateStr);
+	const IS_INVALID_DATE = isNaN(dateObj);
+
+	if (IS_INVALID_DATE) return dateStr;
+	else return formatDateAsDisplayString(dateObj);
 }
 
 export function stripHtml(html) {
