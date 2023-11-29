@@ -1,4 +1,5 @@
 const BASE_URL = "http://localhost:8080/apis";
+// const BASE_URL = "http://localhost:4173/apis";
 const ENDPOINTS = {
 	GET_JIRA_ISSUE: "/jira/fetch/issue",
 	ADD_JOB: "/add/issue",
