@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from "vue";
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from "vue";
 import { Splitpanes, Pane } from "splitpanes";
 import "splitpanes/dist/splitpanes.css";
 
@@ -11,12 +11,15 @@ import ModalAddStories from "@/components/ModalAddStories.vue";
 import EmptyPlaceholder from "@/components/EmptyPlaceholder.vue";
 import LastActionLabel from "@/components/LastActionLabel.vue";
 import { JIRA_ISSUE_URL } from "@/lib/constants.js";
+import { scrollToBottomIfNeeded } from "@/lib/utils.js";
 
 import { useUserStoriesStore } from "@/stores/user-stories";
 import { useTestScenariosStore } from "@/stores/test-scenarios";
 
 const userStoriesStore = useUserStoriesStore();
 const testScenariosStore = useTestScenariosStore();
+
+const infoMessagesDom = ref(null);
 
 const userStoriesCount = computed(() => {
 	return userStoriesStore && userStoriesStore.items
@@ -64,6 +67,8 @@ const startPolling = async () => {
 		try {
 			if (userStoriesStore.processing.length > 0) {
 				await userStoriesStore.checkQueuedStories();
+				await nextTick();
+				scrollToBottomIfNeeded(infoMessagesDom.value);
 			}
 			// Schedule the next call after a delay if the function completes successfully
 			timeoutId = setTimeout(pollFunction, POLL_INTERVAL); // Poll every 5 seconds
@@ -83,6 +88,15 @@ onUnmounted(() => {
 		clearTimeout(timeoutId);
 	}
 });
+
+// if user switch to view another user story, trigger a info panel force scroll
+watch(
+	() => currentUserStoryId.value,
+	async (newValue, oldValue) => {
+		await nextTick();
+		scrollToBottomIfNeeded(infoMessagesDom.value, true);
+	}
+);
 
 // TODO: Remove this from production (this is only for mock data)
 userStoriesStore.shiftToProcessing();
@@ -184,7 +198,7 @@ userStoriesStore.shiftToProcessing();
 							title="Nothing to see here"
 							description=""
 						/>
-						<ul class="flex flex-col gap-3 px-3 overflow-auto list-none pb-4">
+						<ul class="flex flex-col gap-3 px-3 overflow-auto list-none pb-4" ref="infoMessagesDom">
 							<li
 								v-for="(
 									{ type, title, content, date }, index

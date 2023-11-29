@@ -44,3 +44,29 @@ export function stripHtml(html) {
 	let doc = new DOMParser().parseFromString(html, "text/html");
 	return doc.body.textContent || "";
 }
+
+export function scrollToBottomIfNeeded(
+  element,
+  forceScroll = false,
+  minPercentScrolled = 95,
+  minPixelsLeftToScroll = 50
+) {
+  if (!element) return false;
+
+  // Calculate the current scroll percentage
+  const currentScrollPercentage =
+    ((element.scrollTop + element.clientHeight) / element.scrollHeight) * 100;
+
+  const currentPixelsLeftToScroll =
+    element.scrollHeight - (element.scrollTop + element.clientHeight);
+
+  // Check if the current scroll is above the threshold or if forceScroll is true
+  if (
+    currentScrollPercentage >= minPercentScrolled ||
+    currentPixelsLeftToScroll <= minPixelsLeftToScroll ||
+    forceScroll
+  ) {
+    // Scroll to the bottom
+    element.scrollTop = element.scrollHeight;
+  }
+}

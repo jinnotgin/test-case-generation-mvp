@@ -4,7 +4,7 @@ const props = defineProps(["status", "lastAction"]);
 </script>
 
 <template>
-	<div v-if="props.status !== STORY_STATUS.QUEUED" class="px-3 flex gap-2">
+	<div v-if="props.status !== STORY_STATUS.QUEUED" class="flex gap-2">
 		<span class="font-bold">Activity:</span>
 		<div
 			:class="{
