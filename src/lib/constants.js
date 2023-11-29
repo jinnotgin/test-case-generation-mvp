@@ -28,3 +28,16 @@ export const API_MESSAGE_STATUS = {
 	SUCCESS: "SUCCESS",
 	ERROR: "ERROR",
 };
+
+export const JOB_LAST_ACTION_DISPLAY_NAME = (lastAction) => {
+	const mapping = {
+		CREATING_PROMPTS: "Clarifying with other Knowledge Bases", // qinkai's backend
+		CLARIFYING_CONTEXT: "Clarifying with other Knowledge Bases", // qinkai's backend
+		CLARIFYING_STORIES: "Clarifying with other Knowledge Bases", // qinkai's backend
+		CLARIFYING: "Clarifying with other Knowledge Bases",
+		GENERATING_TEST_SCENARIOS: "Generating Test Scenarios",
+		COMPLETED: "Complete",
+	};
+	if (Object.keys(mapping).includes(lastAction)) return mapping[lastAction];
+	else return lastAction;
+};

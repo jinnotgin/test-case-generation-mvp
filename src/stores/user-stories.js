@@ -6,7 +6,12 @@ import {
 	getJobOutput as api_getJobOutput,
 } from "@/lib/api.js";
 import { useTestScenariosStore } from "@/stores/test-scenarios.js";
-import { STORY_STATUS, API_JOB_STATUS, MESSAGE_TYPE } from "@/lib/constants.js";
+import {
+	STORY_STATUS,
+	API_JOB_STATUS,
+	MESSAGE_TYPE,
+	JOB_LAST_ACTION_DISPLAY_NAME,
+} from "@/lib/constants.js";
 
 export const useUserStoriesStore = defineStore("user-stories", {
 	state: () => ({
@@ -14,70 +19,6 @@ export const useUserStoriesStore = defineStore("user-stories", {
 			// success: SLS-8041, SLS-8140, SLS-7907, SLS-8453, SLS-7906
 			// interesting: SLS-8110
 			// failure: SLS-8040 (timeout)
-			// "SLS-8140": {
-			// 	jobId: "qn1w4eIBvMsjWXXLpWhMB",
-			// 	title:
-			// 		"As Teacher, given a Question with Speech Evaluation (SE) component in a Teacher Release Quiz, only allowed to mark my student's responses after the external Speech Evaluation engine has provided marks recommendations",
-			// 	content: "",
-			// 	status: STORY_STATUS.QUEUED,
-			// 	infoMessages: [],
-			// },
-			// "SLS-8041": {
-			// 	jobId: "-8tEwbII4FctBS-v8mIvX",
-			// 	title:
-			// 		"As a student, view gamification information for a gamified course (General page) (via Consumption)",
-			// 	content: "",
-			// 	status: STORY_STATUS.QUEUED,
-			// 	infoMessages: [],
-			// },
-			// "SLS-7907": {
-			// 	jobId: "GKsoSTAo3FleRNGRdvDIN",
-			// 	title:
-			// 		"As Teacher,  See the list of all Game Story in view mode and edit mode",
-			// 	content: "",
-			// 	status: STORY_STATUS.QUEUED,
-			// 	infoMessages: [],
-			// },
-			// "SLS-8453": {
-			// 	jobId: "vw4jVH0Ioe8NtcMNhL5K7",
-			// 	title:
-			// 		"As Teacher, add student assignees into an Activity Team (when creating a new team, or when editing an existing team)",
-			// 	content: "",
-			// 	status: STORY_STATUS.QUEUED,
-			// 	infoMessages: [],
-			// },
-			// "SLS-8110": {
-			// 	jobId: "XXUYtk8s4j2jjR1DwvF9U",
-			// 	title:
-			// 		"[UI Update] Visual indicator of Gamified Course Cards / Assignment Cards (now more prominent)",
-			// 	content: "",
-			// 	status: STORY_STATUS.QUEUED,
-			// 	infoMessages: [],
-			// },
-			// "SLS-8040": {
-			// 	jobId: "YkP1Snu-chQUSyUHhARtk",
-			// 	title:
-			// 		"As a user, able to browse Gamified course from cards and table listing",
-			// 	content: "",
-			// 	status: STORY_STATUS.QUEUED,
-			// 	infoMessages: [],
-			// },
-			// "SLS-8040": {
-			// 	jobId: "YkP1Snu-chQUSyUHhARtk",
-			// 	title:
-			// 		"As a user, able to browse Gamified course from cards and table listing",
-			// 	content: "",
-			// 	status: STORY_STATUS.QUEUED,
-			// 	infoMessages: [],
-			// },
-			// "SLS-7906": {
-			// 	jobId: "JFeDBlnjkT79Z_iZZyRvp",
-			// 	title:
-			// 		"As Teacher,  See the list of all achievement in view mode and edit mode",
-			// 	content: "",
-			// 	status: STORY_STATUS.QUEUED,
-			// 	infoMessages: [],
-			// },
 		},
 		processing: [],
 		maxQueueLength: 1, // configurable queue length
@@ -103,6 +44,7 @@ export const useUserStoriesStore = defineStore("user-stories", {
 				title,
 				content,
 				status: STORY_STATUS.QUEUED,
+				lastAction: null,
 				infoMessages: [],
 			};
 
@@ -163,13 +105,15 @@ export const useUserStoriesStore = defineStore("user-stories", {
 
 				const currentTime = Date.now();
 				const data = await api_getJobStatus(jobId, currentTime);
-				const { status = null, messages } = data;
+				const { status = null, lastAction = null, messages } = data;
 
 				if (status === null || status === API_JOB_STATUS.ERROR) {
 					this.setItemStatus(storyId, STORY_STATUS.ERROR);
 					this.removeFromProcessing(storyId);
 					return false;
 				}
+
+				this.setItemLastAction(storyId, lastAction);
 
 				// TODO: not efficient but works for now until api upgraded to support getting message after a certain time
 				this.items[storyId].infoMessages = []; // clear out existing messages
@@ -204,6 +148,10 @@ export const useUserStoriesStore = defineStore("user-stories", {
 		},
 		setItemStatus(itemId, newStatus) {
 			this.items[itemId].status = newStatus;
+		},
+		setItemLastAction(itemId, newLastAction) {
+			this.items[itemId].lastAction =
+				JOB_LAST_ACTION_DISPLAY_NAME(newLastAction);
 		},
 		async getGeneratedTestScenarios_fake(userStoryId) {
 			// assume success and we have the data now

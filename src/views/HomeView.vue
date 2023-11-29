@@ -9,6 +9,7 @@ import AlertInline from "@/components/AlertInline.vue";
 import ButtonSmall from "@/components/ButtonSmall.vue";
 import ModalAddStories from "@/components/ModalAddStories.vue";
 import EmptyPlaceholder from "@/components/EmptyPlaceholder.vue";
+import LastActionLabel from "@/components/LastActionLabel.vue";
 import { JIRA_ISSUE_URL } from "@/lib/constants.js";
 
 import { useUserStoriesStore } from "@/stores/user-stories";
@@ -24,9 +25,6 @@ const userStoriesCount = computed(() => {
 });
 
 const currentUserStoryId = ref(null);
-if (userStoriesCount.value > 0) {
-	currentUserStoryId.value = Object.keys(userStoriesStore.items)[0];
-}
 
 function handleUserStoryClick(key) {
 	currentUserStoryId.value = key;
@@ -169,9 +167,15 @@ userStoriesStore.shiftToProcessing();
 					/></pane>
 					<pane size="35" class="flex flex-col gap-2"
 						><div
-							class="bg-gray-600 text-white px-3 py-2 flex justify-between items-center"
+							class="bg-gray-600 text-white px-3 py-2 flex justify-between items-center text-sm"
 						>
-							<span class="text-sm font-bold">Info Panel</span>
+							<span class="font-bold">Info Panel</span>
+
+							<LastActionLabel
+								v-if="currentUserStoryId"
+								:status="currentUserStoryData.status"
+								:lastAction="currentUserStoryData.lastAction"
+							/>
 						</div>
 
 						<EmptyPlaceholder
