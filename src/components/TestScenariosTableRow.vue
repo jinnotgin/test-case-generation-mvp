@@ -150,9 +150,13 @@ const currentJiraIssueUrl = computed(() => {
 					<vue-feather type="check" size="20" class="w-5 h-5" />
 				</button>
 			</div>
-			<a v-else class="text-xs align-top" :href="currentJiraIssueUrl">{{
-				issueId
-			}}</a>
+			<a
+				v-else
+				class="text-xs align-top"
+				:href="currentJiraIssueUrl"
+				target="_blank"
+				>{{ issueId }}</a
+			>
 		</td>
 	</tr>
 </template>

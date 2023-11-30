@@ -178,6 +178,7 @@ userStoriesStore.shiftToProcessing();
 										<a
 											:href="currentJiraIssueUrl"
 											class="font-bold hover:text-gray-600 dark:hover:text-gray-200 hover:underline"
+											target="_blank"
 											tabindex="0"
 											role="link"
 											>{{ currentUserStoryId }}</a
