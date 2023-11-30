@@ -126,9 +126,8 @@ export async function updateTest(testId, title, description) {
 
 export async function publishJiraTestsBulk(testIdsArray = []) {
 	try {
-		const payload = {
-			testScenarioUuids: testIdsArray,
-		};
+		const payload = testIdsArray;
+
 		const response = await fetch(url(ENDPOINTS.CREATE_JIRA_TESTS_BULK), {
 			method: "POST",
 			headers: {
