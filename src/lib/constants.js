@@ -31,10 +31,10 @@ export const API_MESSAGE_STATUS = {
 
 export const JOB_LAST_ACTION_DISPLAY_NAME = (lastAction) => {
 	const mapping = {
-		CREATING_PROMPTS: "Clarifying with other Knowledge Bases", // qinkai's backend
-		CLARIFYING_CONTEXT: "Clarifying with other Knowledge Bases", // qinkai's backend
-		CLARIFYING_STORIES: "Clarifying with other Knowledge Bases", // qinkai's backend
-		CLARIFYING: "Clarifying with other Knowledge Bases",
+		CREATING_PROMPTS: "Clarifying with other Knowledge Sources", // qinkai's backend
+		CLARIFYING_CONTEXT: "Clarifying with other Knowledge Sources", // qinkai's backend
+		CLARIFYING_STORIES: "Clarifying with other Knowledge Sources", // qinkai's backend
+		CLARIFYING: "Clarifying with other Knowledge Sources",
 		GENERATING_TEST_SCENARIOS: "Generating Test Scenarios",
 		COMPLETED: "Complete",
 	};
