@@ -16,10 +16,12 @@ import {
 export const useUserStoriesStore = defineStore("user-stories", {
 	state: () => ({
 		items: {
-			// success: SLS-8041, SLS-8140, SLS-7907, SLS-8453, SLS-7906
+			// success: SLS-8140, SLS-8453, SLS-7906,  SLS-8041, SLS-8634
+			// long: SLS-7907
 			// interesting: SLS-8110
 			// failure: SLS-8040 (timeout)
 			// interesting (making something from nothing): SLS-5423
+			// S
 		},
 		processing: [],
 		maxQueueLength: 1, // configurable queue length
