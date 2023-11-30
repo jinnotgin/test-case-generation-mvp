@@ -139,11 +139,10 @@ export async function publishJiraTestsBulk(testIdsArray = []) {
 			throw new Error("Network response was not ok");
 		}
 
-		const {
-			data: { testId = [] },
-		} = await response.json();
+		const { data = [] } = await response.json();
+		console.log(data);
 
-		return testId;
+		return data;
 	} catch (error) {
 		console.error(error);
 		throw error;
